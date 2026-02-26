@@ -8,7 +8,7 @@ export default async (request, response) => {
     },
     {
       action: "record",
-      eventUrl: ["https://your-server.com/handleRecording"], // replace with your callback
+      eventUrl: ["https://your-glitch-project.glitch.me/handleRecording"], // <- update this after deploying server
       endOnKey: "#",
       timeOut: 5,
       maxLength: 25,
@@ -20,5 +20,4 @@ export default async (request, response) => {
 };
 
 
-// replace with your callback
 // This is a single-line comment (a note).
