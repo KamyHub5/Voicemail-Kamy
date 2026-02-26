@@ -18,3 +18,6 @@ export default async (request, response) => {
 
   response.json(ncco);
 };
+
+
+// This is a single-line comment (a note).
