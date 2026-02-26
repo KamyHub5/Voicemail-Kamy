@@ -21,3 +21,4 @@ export default async (request, response) => {
 
 
 // This is a single-line comment (a note).
+// Replace the eventUrl with the public URL of your recording server (Glitch, Replit, etc.).
