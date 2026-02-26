@@ -1,3 +1,4 @@
+// index.js
 export default async (request, response) => {
   const ncco = [
     {
@@ -8,7 +9,7 @@ export default async (request, response) => {
     },
     {
       action: "record",
-      eventUrl: ["https://your-glitch-project.glitch.me/handleRecording"], // <- update this after deploying server
+      eventUrl: ["https://YOUR_CALLBACK_URL/handleRecording"], // <- update this after deploying server
       endOnKey: "#",
       timeOut: 5,
       maxLength: 25,
@@ -21,4 +22,4 @@ export default async (request, response) => {
 
 
 // This is a single-line comment (a note).
-// Replace the eventUrl with the public URL of your recording server (Glitch, Replit, etc.).
+// Replace https://YOUR_CALLBACK_URL/handleRecording with your Cloud Runtime server callback — we’ll set that next.
