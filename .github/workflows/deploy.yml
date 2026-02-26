@@ -1,0 +1,11 @@
+project:
+  name: voicemail
+
+instance:
+  name: dev
+  runtime: nodejs22
+  region: aws.use1
+  application-id: YOUR_VONAGE_APPLICATION_ID
+  entrypoint: [node, index.js]
+  capabilities:
+    - voice
