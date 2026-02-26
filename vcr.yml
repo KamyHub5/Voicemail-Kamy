@@ -5,10 +5,11 @@ instance:
   name: dev
   runtime: nodejs22
   region: aws.use1
-  application-id: YOUR_VONAGE_APPLICATION_ID
+  application-id: 93cbd13e-b81b-4836-8a00-630c6cb3d3b9
   entrypoint: [node, index.js]
   capabilities:
     - voice
 
 # This is a full line comment
 # Replace YOUR_VONAGE_APPLICATION_ID with your Vonage app ID.
+# APPLICATION ID: 93cbd13e-b81b-4836-8a00-630c6cb3d3b9 
