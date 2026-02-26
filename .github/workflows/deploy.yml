@@ -1,11 +1,19 @@
-project:
-  name: voicemail
+name: Deploy to Vonage Cloud Runtime
 
-instance:
-  name: dev
-  runtime: nodejs22
-  region: aws.use1
-  application-id: YOUR_VONAGE_APPLICATION_ID
-  entrypoint: [node, index.js]
-  capabilities:
-    - voice
+on:
+  push:
+    branches: [ "main" ]  # run deploy whenever you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Cloud Runtime CLI
+        run: npm install -g @vonage/cloud-runtime-cli
+      - name: Deploy to Vonage
+        run: |
+          vcr deploy \
+            --api-key ${{ secrets.VONAGE_API_KEY }} \
+            --api-secret ${{ secrets.VONAGE_API_SECRET }} \
+            --region aws.use1
