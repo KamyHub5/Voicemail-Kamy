@@ -1,7 +1,12 @@
-{
-  "version": 2,
-  "routes": [
-    { "src": "/answer", "dest": "/api/answer.js" },
-    { "src": "/events", "dest": "/api/events.js" }
-  ]
+module.exports = function handler(req, res) {
+  const ncco = [
+    {
+      action: "talk",
+      text: "Hello. Thank you for calling. Goodbye.",
+      language: "en-GB",
+      style: 0
+    }
+  ];
+  res.setHeader("Content-Type", "application/json");
+  res.status(200).json(ncco);
 }
