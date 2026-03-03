@@ -1,4 +1,4 @@
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   const ncco = [
     {
       action: "talk",
@@ -7,6 +7,5 @@ export default function handler(req, res) {
       style: 0
     }
   ];
-
   res.status(200).json(ncco);
 }
