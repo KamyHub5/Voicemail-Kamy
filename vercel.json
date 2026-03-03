@@ -1,6 +1,7 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/answer", "dest": "/answer.js" }
+    { "src": "/answer", "dest": "/answer.js" },
+    { "src": "/events", "dest": "/events.js" }
   ]
 }
