@@ -7,5 +7,6 @@ module.exports = function handler(req, res) {
       style: 0
     }
   ];
+  res.setHeader("Content-Type", "application/json");
   res.status(200).json(ncco);
 }
