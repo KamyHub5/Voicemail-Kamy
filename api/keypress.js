@@ -11,9 +11,6 @@ export default function handler(req, res) {
       },
       {
         action: "record",
-        format: "mp3",
-        endOnSilence: 5,
-        endOnKey: "#",
         beepStart: true,
         eventUrl: ["https://voicemail-kamy.vercel.app/api/recording"],
         eventMethod: "POST"
