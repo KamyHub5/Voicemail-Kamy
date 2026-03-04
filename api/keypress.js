@@ -36,6 +36,7 @@ export default function handler(req, res) {
       timeout: 15,
       eventUrl: [`${config.BASE_URL}/api/outbound-events`],
       eventMethod: "POST",
+      eventType: "synchronous",
       endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
     }
   ]);
