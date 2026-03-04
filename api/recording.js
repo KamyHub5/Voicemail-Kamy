@@ -6,19 +6,18 @@ export default async function handler(req, res) {
   const from = "13105151321";
   const text = "New Voicemail Received";
 
-  // The most direct REST URL possible
+  // This is the direct, "pre-JWT" way to send a text
   const url = `https://rest.nexmo.com/sms/json?api_key=${apiKey}&api_secret=${apiSecret}&to=${to}&from=${from}&text=${encodeURIComponent(text)}`;
 
   try {
     const response = await fetch(url, { method: 'POST' });
     const data = await response.json();
     
-    // Check Vercel Logs for this specific line to see Vonage's real answer
+    // Check Vercel Logs for: VONAGE_FINAL_ANSWER
     console.log("VONAGE_FINAL_ANSWER:", JSON.stringify(data));
   } catch (error) {
     console.log("VERCEL_EXECUTION_ERROR:", error.message);
   }
 
-  // Always send 200 to Vonage so it stops trying to retry the webhook
   res.status(200).send("OK");
 }
