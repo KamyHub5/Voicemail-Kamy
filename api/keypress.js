@@ -8,36 +8,28 @@ export default function handler(req, res) {
     res.status(200).json([
       {
         action: "talk",
-        text: "<speak><prosody volume='+6dB'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</prosody></speak>",
+        text: "Please leave a message. You can press pound or just hang up when you are done.",
         language: "en-GB"
       },
       {
         action: "record",
         format: "mp3",
-        endOnSilence: 5,
-        endOnKey: "#",
         beepStart: true,
-        eventUrl: [`${config.BASE_URL}/api/recording`],
+        // Removing endOnKey makes it asynchronous: it fires on BOTH hangup and #
+        eventUrl: [`https://voicemail-kamy.vercel.app/api/recording`],
+        eventMethod: "POST",
         transcription: {
-          eventUrl: [`${config.BASE_URL}/api/transcript`],
+          eventUrl: [`https://voicemail-kamy.vercel.app/api/transcript`],
           language: "en-GB"
         }
-      },
-      {
-        action: "talk",
-        text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
-        language: "en-GB"
       }
     ]);
   } else {
     res.status(200).json([
       {
         action: "connect",
-        timeout: 15,
-        from: config.VONAGE_NUMBER,
-        eventType: "synchronous",
-        eventUrl: [`${config.BASE_URL}/api/outbound-events`],
-        endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
+        from: "13105151321",
+        endpoint: [{ type: "phone", number: "13059827377" }]
       }
     ]);
   }
