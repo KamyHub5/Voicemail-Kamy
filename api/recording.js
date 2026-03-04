@@ -1,6 +1,7 @@
 import { tokenGenerate } from '@vonage/jwt';
 
 export default async function handler(req, res) {
+  // 1. HARDCODED CONFIG
   const appId = "ecefa59a-3067-489d-b3cd-d0cef77dca53";
   const privateKey = `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCbKR+cEFKEphE9
@@ -34,30 +35,31 @@ zdwPD79QcDliX9egBiuiDw==
   const jwt = tokenGenerate(appId, privateKey);
   const body = req.body || {};
   
-  console.log("REC_WEBHOOK_RECEIVED:", JSON.stringify(body));
+  // Log every request to Vercel so we can see it
+  console.log("LOG: Incoming Webhook from Vonage:", JSON.stringify(body));
 
-  if (body.recording_url || body.status === 'completed') {
-    try {
-      const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwt}`
-        },
-        body: JSON.stringify({
-          message_type: 'text',
-          text: `Voicemail Alert!\nFrom: ${body.from || 'Unknown'}\nStatus: Completed`,
-          to: "13059827377",
-          from: "13105151321",
-          channel: 'sms'
-        })
-      });
+  try {
+    // 2. SEND PLAIN TEXT SMS IMMEDIATELY
+    const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      },
+      body: JSON.stringify({
+        message_type: 'text',
+        text: "New Voicemail Received. (Plain Text Test)",
+        to: "13059827377",
+        from: "13105151321",
+        channel: 'sms'
+      })
+    });
 
-      const smsData = await smsRes.json();
-      console.log("SMS_API_RESULT:", JSON.stringify(smsData));
-    } catch (err) {
-      console.error("SMS_CRASH:", err.message);
-    }
+    const smsData = await smsRes.json();
+    console.log("LOG: Vonage Response:", JSON.stringify(smsData));
+  } catch (err) {
+    console.error("LOG: SMS Submission Failed:", err.message);
   }
+
   res.status(200).json({ status: "ok" });
 }
