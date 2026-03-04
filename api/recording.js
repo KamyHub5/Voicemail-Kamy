@@ -1,59 +1,68 @@
 import config from './config.js';
 
 export default async function handler(req, res) {
-  // 1. Handle browser test visits
+  const auth = Buffer.from(`${config.VONAGE_API_KEY}:${config.VONAGE_API_SECRET}`).toString('base64');
+
+  // BROWSER TEST: Visit https://voicemail-kamy.vercel.app/api/recording
   if (req.method === 'GET') {
-    return res.status(200).json({ status: "Function is alive and healthy" });
-  }
-
-  const body = req.body || {};
-  
-  if (body.recording_url) {
     try {
-      // 2. Download the audio file directly using a Bearer token
-      // We use the basic auth header for simplicity since it's an internal server request
-      const auth = Buffer.from(`${config.VONAGE_API_KEY}:${config.VONAGE_API_SECRET}`).toString('base64');
-      
-      const audioRes = await fetch(body.recording_url, {
-        headers: { 'Authorization': `Basic ${auth}` }
-      });
-
-      if (!audioRes.ok) throw new Error(`Vonage download failed: ${audioRes.status}`);
-      const audioBuffer = await audioRes.arrayBuffer();
-
-      // 3. Upload to file.io
-      const fileRes = await fetch('https://file.io/?expires=1d', {
-        method: 'POST',
-        body: Buffer.from(audioBuffer)
-      });
-      const fileData = await fileRes.json();
-      const easyLink = fileData.link || "Link Expired";
-
-      // 4. Send the SMS using a simple REST fetch call to the Messages API
-      const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
+      const testRes = await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
           'Authorization': `Basic ${auth}`
         },
         body: JSON.stringify({
           message_type: 'text',
-          text: `Voicemail Alert!\nFrom: ${body.from || 'Unknown'}\nListen: ${easyLink}`,
+          text: "Diagnostic Test: If you see this, the API connection is good.",
           to: config.KAMY_NUMBER,
           from: config.VONAGE_NUMBER,
           channel: 'sms'
         })
       });
 
-      const smsData = await smsRes.json();
-      console.log("SMS result:", smsData);
-
+      const result = await testRes.json();
+      return res.status(200).json({
+        message: "Vonage API Response Received",
+        raw_response: result
+      });
     } catch (err) {
-      // This will now show up in your Vercel logs instead of a 500 crash
-      console.error("Internal Error:", err.message);
+      return res.status(500).json({ error: err.message });
     }
   }
 
+  // REAL WEBHOOK LOGIC: (When Vonage calls this after a voicemail)
+  const body = req.body || {};
+  if (body.recording_url) {
+    try {
+      const audioRes = await fetch(body.recording_url, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
+      const audioBuffer = await audioRes.arrayBuffer();
+
+      const fileRes = await fetch('https://file.io/?expires=1d', {
+        method: 'POST',
+        body: Buffer.from(audioBuffer)
+      });
+      const fileData = await fileRes.json();
+
+      await fetch(`https://api.nexmo.com/v1/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${auth}`
+        },
+        body: JSON.stringify({
+          message_type: 'text',
+          text: `New Voicemail!\nListen: ${fileData.link || "Error uploading"}`,
+          to: config.KAMY_NUMBER,
+          from: config.VONAGE_NUMBER,
+          channel: 'sms'
+        })
+      });
+    } catch (err) {
+      console.error("Recording error:", err.message);
+    }
+  }
   return res.status(200).json({ status: "ok" });
 }
