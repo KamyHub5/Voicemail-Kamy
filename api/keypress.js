@@ -8,7 +8,7 @@ module.exports = function handler(req, res) {
     res.status(200).json([
       {
         action: "talk",
-        text: "<speak><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
+        text: "<speak><prosody volume='x-loud'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</prosody></speak>",
         language: "en-GB"
       },
       {
@@ -21,7 +21,7 @@ module.exports = function handler(req, res) {
       },
       {
         action: "talk",
-        text: "Your message has been recorded. Thank you. Goodbye.",
+        text: "<speak><prosody volume='x-loud'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
         language: "en-GB"
       }
     ]);
@@ -33,12 +33,7 @@ module.exports = function handler(req, res) {
         from: "13105151321",
         eventType: "synchronous",
         eventUrl: [`${config.BASE_URL}/api/outbound-events`],
-        endpoint: [
-          {
-            type: "phone",
-            number: "13059827377"
-          }
-        ]
+        endpoint: [{ type: "phone", number: "13059827377" }]
       }
     ]);
   }
