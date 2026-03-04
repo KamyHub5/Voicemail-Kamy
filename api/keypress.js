@@ -1,5 +1,3 @@
-import config from "./config.js";
-
 export default function handler(req, res) {
   const body = req.body || {};
   const digit = body.dtmf?.digits || body.digits || "";
@@ -17,8 +15,7 @@ export default function handler(req, res) {
         endOnSilence: 5,
         endOnKey: "#",
         beepStart: true,
-        // This is the trigger for your SMS
-        eventUrl: [`${config.BASE_URL}/api/recording`],
+        eventUrl: ["https://voicemail-kamy.vercel.app/api/recording"],
         eventMethod: "POST"
       },
       {
@@ -31,11 +28,8 @@ export default function handler(req, res) {
     res.status(200).json([
       {
         action: "connect",
-        timeout: 15,
-        from: config.VONAGE_NUMBER,
-        eventType: "synchronous",
-        eventUrl: [`${config.BASE_URL}/api/outbound-events`],
-        endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
+        from: "13105151321",
+        endpoint: [{ type: "phone", number: "13059827377" }]
       }
     ]);
   }
