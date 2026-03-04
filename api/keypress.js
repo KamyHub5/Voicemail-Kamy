@@ -5,46 +5,38 @@ export default function handler(req, res) {
   const digit = body.dtmf?.digits || body.digits || "";
 
   if (digit === "*") {
-    // Star pressed — go to voicemail directly
-    res.status(200).json([
+    return res.status(200).json([
       {
         action: "talk",
-        text: "<speak><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
-        language: "en-GB",
-        style: 0
+        text: "<speak><prosody volume='+6dB'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</prosody></speak>",
+        language: "en-GB"
       },
       {
         action: "record",
         format: "mp3",
         endOnSilence: 5,
         endOnKey: "#",
+        timeOut: 25,
         beepStart: true,
-        eventUrl: [`${config.BASE_URL}/api/recording`]
+        eventUrl: [`${config.BASE_URL}/api/recording`],
+        eventMethod: "POST"
       },
       {
         action: "talk",
         text: "Your message has been recorded. Thank you. Goodbye.",
-        language: "en-GB",
-        style: 0
-      }
-    ]);
-  } else {
-    // No key pressed — connect to Kamy's phone
-    // outbound-events.js handles what happens if no answer
-    res.status(200).json([
-      {
-        action: "connect",
-        timeout: 15,
-        from: config.VONAGE_NUMBER,
-        eventUrl: [`${config.BASE_URL}/api/outbound-events`],
-        eventMethod: "POST",
-        endpoint: [
-          {
-            type: "phone",
-            number: config.KAMY_NUMBER
-          }
-        ]
+        language: "en-GB"
       }
     ]);
   }
+
+  res.status(200).json([
+    {
+      action: "connect",
+      from: config.VONAGE_NUMBER,
+      timeout: 15,
+      eventUrl: [`${config.BASE_URL}/api/outbound-events`],
+      eventMethod: "POST",
+      endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
+    }
+  ]);
 }
