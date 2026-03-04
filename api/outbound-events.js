@@ -1,14 +1,14 @@
-const config = require("./config");
+import config from "./config.js";
 
-module.exports = function handler(req, res) {
+export default function handler(req, res) {
   const body = req.body;
   
   if (["timeout", "no-answer", "busy", "rejected", "failed"].includes(body.status)) {
     return res.status(200).json([
       {
         action: "talk",
-        text: "<speak><prosody volume='x-loud'><break time='2s'/>I'm sorry, I couldn't reach the recipient. Please leave a message after the tone. Press the pound key when finished.</prosody></speak>",
-        language: "en-GB"
+        text: "<speak><prosody volume='+6dB'><break time='2s'/>I'm sorry, I couldn't reach the recipient. Please leave a message after the tone. Press the pound key when finished.</speak>",
+        voiceName: "Kimberly"
       },
       {
         action: "record",
@@ -20,8 +20,8 @@ module.exports = function handler(req, res) {
       },
       {
         action: "talk",
-        text: "<speak><prosody volume='x-loud'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
-        language: "en-GB"
+        text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
+        voiceName: "Kimberly"
       }
     ]);
   }
