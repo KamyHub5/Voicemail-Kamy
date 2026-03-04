@@ -2,6 +2,8 @@ import config from "./config.js";
 
 export default function handler(req, res) {
   const body = req.body || {};
+  
+  console.log("OUTBOUND EVENT:", JSON.stringify(body));
 
   if (["timeout", "no-answer", "busy", "rejected", "failed"].includes(body.status)) {
     return res.status(200).json([
