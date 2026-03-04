@@ -1,23 +1,33 @@
+import config from "./config.js";
+
 export default async function handler(req, res) {
-  // Your confirmed keys from config.js
-  const apiKey = "7bfc838f";
-  const apiSecret = "9GU2UPa0s$5";
-  const to = "13059827377";
-  const from = "13105151321";
-  const text = "New Voicemail Received";
+  const body = req.body || req.query;
+  const recordingUrl = body.recording_url;
+  const timestamp = body.start_time;
 
-  // This is the direct, "pre-JWT" way to send a text
-  const url = `https://rest.nexmo.com/sms/json?api_key=${apiKey}&api_secret=${apiSecret}&to=${to}&from=${from}&text=${encodeURIComponent(text)}`;
+  console.log("NEW VOICEMAIL RECEIVED");
+  console.log("Recording URL:", recordingUrl);
+  console.log("Time:", timestamp);
 
+  // Send SMS to Kamy via Vonage
   try {
-    const response = await fetch(url, { method: 'POST' });
-    const data = await response.json();
-    
-    // Check Vercel Logs for: VONAGE_FINAL_ANSWER
-    console.log("VONAGE_FINAL_ANSWER:", JSON.stringify(data));
-  } catch (error) {
-    console.log("VERCEL_EXECUTION_ERROR:", error.message);
+    const response = await fetch("https://rest.nexmo.com/sms/json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: config.VONAGE_API_KEY,
+        api_secret: config.VONAGE_API_SECRET,
+        from: config.VONAGE_NUMBER,
+        to: config.KAMY_NUMBER,
+        text: `New voicemail received at ${timestamp}. Listen here: ${recordingUrl}`
+      })
+    });
+
+    const result = await response.json();
+    console.log("SMS result:", JSON.stringify(result));
+  } catch (err) {
+    console.error("SMS failed:", err);
   }
 
-  res.status(200).send("OK");
+  res.status(200).json({ status: "ok" });
 }
