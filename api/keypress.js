@@ -5,7 +5,6 @@ module.exports = function handler(req, res) {
   const digit = body.dtmf?.digits || body.digits || "";
 
   if (digit === "*") {
-    // Star pressed — go straight to voicemail
     res.status(200).json([
       {
         action: "talk",
@@ -30,14 +29,12 @@ module.exports = function handler(req, res) {
       }
     ]);
   } else {
-    // No key or wrong key — connect to Kamy
     res.status(200).json([
       {
         action: "connect",
-        timeout: 3,
+        timeout: 15,
         from: config.VONAGE_NUMBER,
         eventUrl: [`${config.BASE_URL}/api/events`],
-        eventMethod: "POST",
         endpoint: [
           {
             type: "phone",
@@ -46,7 +43,6 @@ module.exports = function handler(req, res) {
         ]
       },
       {
-        // This runs if connect times out or fails
         action: "talk",
         text: "<speak><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
         language: "en-GB",
