@@ -16,11 +16,10 @@ export default async function handler(req, res) {
       await vonage.sms.send({
         to: "13059827377",
         from: "13105151321",
-        text: `Voicemail Transcript: "${body.text}"`
+        text: `Transcript: "${body.text}"`
       });
-      console.log("Transcript sent via SMS");
-    } catch (error) {
-      console.error("Transcript SMS failed:", error);
+    } catch (err) {
+      console.error("Transcript SMS failed:", err);
     }
   }
   res.status(200).json({ status: "ok" });
