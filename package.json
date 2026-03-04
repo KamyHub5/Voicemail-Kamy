@@ -4,19 +4,3 @@
   "type": "module",
   "dependencies": {}
 }
-```
-
----
-
-Repo structure:
-```
-voicemail-kamy/
-├── api/
-│   ├── config.js
-│   ├── answer.js
-│   ├── keypress.js
-│   ├── outbound-events.js
-│   ├── events.js
-│   └── recording.js
-├── vercel.json
-└── package.json
