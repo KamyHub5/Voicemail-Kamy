@@ -1,17 +1,7 @@
-// ─────────────────────────────────────────────
-// Central configuration for Kamy Vonage system
-// Update this file if any credentials or numbers change
-// ─────────────────────────────────────────────
-
-module.exports = {
-  // Vonage master API credentials (from Vonage Dashboard → API Settings)
+export default {
   VONAGE_API_KEY: "7bfc838f",
   VONAGE_API_SECRET: "9GU2UPa0s$5",
-
-  // Vonage Application ID (from Vonage Dashboard → Applications)
   VONAGE_APP_ID: "ecefa59a-3067-489d-b3cd-d0cef77dca53",
-
-  // Private key generated when Vonage application was created
   VONAGE_PRIVATE_KEY: `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCbKR+cEFKEphE9
 Qj8AdI6g+C1vb8UYjzoMrafERaY7ipYtdJqdwCNh6maVk7b3ltyW6CImgUWFstEa
@@ -40,13 +30,7 @@ piHjOZfY0ME0qUCt58Hi07wW/1CyNuDq+O73L7IpKX3CZmCn5RVnO95XtlBUSPtD
 FbQG8nBdhMpBOOdb+RVH+/4Uny6nCLGZJTICFmrq/lDmo24/Nx7YXT+TUyFAcTuB
 zdwPD79QcDliX9egBiuiDw==
 -----END PRIVATE KEY-----`,
-
-  // Your deployed Vercel URL (no trailing slash)
   BASE_URL: "https://voicemail-kamy.vercel.app",
-
-  // Your Vonage virtual number — the number people call (no + sign)
   VONAGE_NUMBER: "13105151321",
-
-  // Kamy's real phone number — where calls get forwarded (no + sign)
   KAMY_NUMBER: "13059827377"
 };
