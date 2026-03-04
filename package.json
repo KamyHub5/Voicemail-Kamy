@@ -1,0 +1,7 @@
+{
+  "name": "kamy-vonage",
+  "version": "1.0.0",
+  "dependencies": {
+    "@vonage/server-sdk": "^3.0.0"
+  }
+}
