@@ -3,7 +3,7 @@ const config = require("./config");
 module.exports = function handler(req, res) {
   const body = req.body;
   
-  // Log this to your Vercel console so we can see the status
+  // Log status for monitoring
   console.log("OUTBOUND STATUS RECEIVED:", body.status);
 
   // If the call to Kamy (13059827377) is not answered within 15s
@@ -11,15 +11,21 @@ module.exports = function handler(req, res) {
     return res.status(200).json([
       {
         action: "talk",
-        text: "<speak><break time='2s'/>I'm sorry, I couldn't reach the recipient. Please leave a message after the tone.</speak>",
+        text: "<speak><break time='2s'/>I'm sorry, I couldn't reach the recipient. Please leave a message after the tone. Press the pound key when finished.</speak>",
         language: "en-GB"
       },
       {
         action: "record",
         format: "mp3",
         endOnSilence: 5,
+        endOnKey: "#",
         beepStart: true,
         eventUrl: [`${config.BASE_URL}/api/recording`]
+      },
+      {
+        action: "talk",
+        text: "Your message has been recorded. Thank you. Goodbye.",
+        language: "en-GB"
       }
     ]);
   }
