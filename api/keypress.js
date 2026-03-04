@@ -1,15 +1,15 @@
 import config from "./config.js";
 
 export default function handler(req, res) {
-  const body = req.body;
+  const body = req.body || {};
   const digit = body.dtmf?.digits || body.digits || "";
 
   if (digit === "*") {
     res.status(200).json([
       {
         action: "talk",
-        text: "<speak><prosody volume='+6dB'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
-        voiceName: "Kimberly"
+        text: "<speak><prosody volume='+6dB'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</prosody></speak>",
+        language: "en-GB"
       },
       {
         action: "record",
@@ -22,7 +22,7 @@ export default function handler(req, res) {
       {
         action: "talk",
         text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
-        voiceName: "Kimberly"
+        language: "en-GB"
       }
     ]);
   } else {
