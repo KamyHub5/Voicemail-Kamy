@@ -1,17 +1,21 @@
 import config from './config.js';
+import { tokenGenerate } from '@vonage/jwt';
 
 export default async function handler(req, res) {
-  // Use Query Params for Auth - this bypasses the "Invalid Token" header issue
-  const authQuery = `api_key=${config.VONAGE_API_KEY}&api_secret=${config.VONAGE_API_SECRET}`;
+  // 1. Generate the required JWT token
+  const jwt = tokenGenerate(config.VONAGE_APP_ID, config.VONAGE_PRIVATE_KEY);
 
   if (req.method === 'GET') {
     try {
-      const testRes = await fetch(`https://api.nexmo.com/v1/messages?${authQuery}`, {
+      const testRes = await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}` // Uses the new JWT
+        },
         body: JSON.stringify({
           message_type: 'text',
-          text: "Diagnostic Test: Auth Fixed",
+          text: "System Test: JWT Auth Successful",
           to: config.KAMY_NUMBER,
           from: config.VONAGE_NUMBER,
           channel: 'sms'
@@ -25,24 +29,29 @@ export default async function handler(req, res) {
     }
   }
 
+  // Webhook Logic
   const body = req.body || {};
   if (body.recording_url) {
     try {
-      // 1. Download audio using Query Auth
-      const audioRes = await fetch(`${body.recording_url}?${authQuery}`);
+      // Use JWT for audio download
+      const audioRes = await fetch(body.recording_url, {
+        headers: { 'Authorization': `Bearer ${jwt}` }
+      });
       const audioBuffer = await audioRes.arrayBuffer();
 
-      // 2. Upload to file.io
       const fileRes = await fetch('https://file.io/?expires=1d', {
         method: 'POST',
         body: Buffer.from(audioBuffer)
       });
       const fileData = await fileRes.json();
 
-      // 3. Send SMS using Query Auth
-      await fetch(`https://api.nexmo.com/v1/messages?${authQuery}`, {
+      // Use JWT for SMS sending
+      await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}`
+        },
         body: JSON.stringify({
           message_type: 'text',
           text: `New Voicemail!\nListen: ${fileData.link || "Error"}`,
@@ -52,7 +61,7 @@ export default async function handler(req, res) {
         })
       });
     } catch (err) {
-      console.error("Process error:", err.message);
+      console.error("JWT Process error:", err.message);
     }
   }
   return res.status(200).json({ status: "ok" });
