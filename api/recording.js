@@ -2,50 +2,31 @@ import config from './config.js';
 import { tokenGenerate } from '@vonage/jwt';
 
 export default async function handler(req, res) {
-  // 1. Generate the required JWT token
+  // Generate JWT for both downloading and sending
   const jwt = tokenGenerate(config.VONAGE_APP_ID, config.VONAGE_PRIVATE_KEY);
 
-  if (req.method === 'GET') {
-    try {
-      const testRes = await fetch(`https://api.nexmo.com/v1/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwt}` // Uses the new JWT
-        },
-        body: JSON.stringify({
-          message_type: 'text',
-          text: "System Test: JWT Auth Successful",
-          to: config.KAMY_NUMBER,
-          from: config.VONAGE_NUMBER,
-          channel: 'sms'
-        })
-      });
-
-      const result = await testRes.json();
-      return res.status(200).json({ status: "Attempted", response: result });
-    } catch (err) {
-      return res.status(500).json({ error: err.message });
-    }
-  }
-
-  // Webhook Logic
+  // Reverted: Now only handles POST requests from Vonage
   const body = req.body || {};
+  
   if (body.recording_url) {
     try {
-      // Use JWT for audio download
+      // 1. Download audio from Vonage using JWT
       const audioRes = await fetch(body.recording_url, {
         headers: { 'Authorization': `Bearer ${jwt}` }
       });
       const audioBuffer = await audioRes.arrayBuffer();
 
+      // 2. Upload to file.io
       const fileRes = await fetch('https://file.io/?expires=1d', {
         method: 'POST',
         body: Buffer.from(audioBuffer)
       });
       const fileData = await fileRes.json();
+      const easyLink = fileData.link || "Link Error";
 
-      // Use JWT for SMS sending
+      const dateStr = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+      
+      // 3. Send SMS via Messages API using JWT
       await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
         headers: {
@@ -54,15 +35,18 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           message_type: 'text',
-          text: `New Voicemail!\nListen: ${fileData.link || "Error"}`,
+          text: `Voicemail Alert!\nFrom: ${body.from || 'Unknown'}\nTime: ${dateStr}\nListen: ${easyLink}`,
           to: config.KAMY_NUMBER,
           from: config.VONAGE_NUMBER,
           channel: 'sms'
         })
       });
+
     } catch (err) {
-      console.error("JWT Process error:", err.message);
+      console.error("Recording process failed:", err.message);
     }
   }
-  return res.status(200).json({ status: "ok" });
+  
+  // Always return 200 to Vonage so it doesn't keep retrying
+  res.status(200).json({ status: "ok" });
 }
