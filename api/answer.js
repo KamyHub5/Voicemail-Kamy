@@ -13,21 +13,8 @@ module.exports = function handler(req, res) {
       action: "input",
       type: ["dtmf"],
       dtmf: { timeOut: 5, maxDigits: 1 },
-      eventUrl: [`${config.BASE_URL}/api/keypress`]
-    },
-    {
-      action: "connect",
-      timeout: 3,
-      from: config.VONAGE_NUMBER,
-      eventUrl: [`${config.BASE_URL}/api/events`],
-      eventMethod: "POST",
-      endpoint: [
-        {
-          type: "phone",
-          number: config.KAMY_NUMBER,
-          dtmfAnswer: "1"
-        }
-      ]
+      eventUrl: [`${config.BASE_URL}/api/keypress`],
+      eventMethod: "POST"
     }
   ]);
 };
