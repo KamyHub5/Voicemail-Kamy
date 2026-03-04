@@ -1,17 +1,19 @@
 import config from './config.js';
+import { tokenGenerate } from '@vonage/jwt';
 
 export default async function handler(req, res) {
   const body = req.body || {};
   
   if (body.text) {
     try {
-      const auth = Buffer.from(`${config.VONAGE_API_KEY}:${config.VONAGE_API_SECRET}`).toString('base64');
+      // Generate JWT for the Transcript SMS
+      const jwt = tokenGenerate(config.VONAGE_APP_ID, config.VONAGE_PRIVATE_KEY);
       
       await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${auth}`
+          'Authorization': `Bearer ${jwt}`
         },
         body: JSON.stringify({
           message_type: 'text',
@@ -21,7 +23,7 @@ export default async function handler(req, res) {
           channel: 'sms'
         })
       });
-      console.log("Transcript SMS sent.");
+      console.log("Transcript SMS submitted to Vonage.");
     } catch (err) {
       console.error("Transcript failed:", err.message);
     }
