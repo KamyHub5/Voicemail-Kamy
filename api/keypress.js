@@ -18,6 +18,11 @@ module.exports = function handler(req, res) {
         endOnKey: "#",
         beepStart: true,
         eventUrl: [`${config.BASE_URL}/api/recording`]
+      },
+      {
+        action: "talk",
+        text: "Your message has been recorded. Thank you. Goodbye.",
+        language: "en-GB"
       }
     ]);
   } else {
