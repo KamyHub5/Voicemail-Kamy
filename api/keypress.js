@@ -17,11 +17,6 @@ export default function handler(req, res) {
         beepStart: true,
         eventUrl: ["https://voicemail-kamy.vercel.app/api/recording"],
         eventMethod: "POST"
-      },
-      {
-        action: "talk",
-        text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
-        language: "en-GB"
       }
     ]);
   } else {
