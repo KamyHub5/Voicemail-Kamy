@@ -2,13 +2,15 @@ import config from "./config.js";
 
 export default function handler(req, res) {
   const body = req.body || {};
-  
+
   if (["timeout", "no-answer", "busy", "rejected", "failed"].includes(body.status)) {
+    // Kamy didn't answer — send caller to voicemail
     return res.status(200).json([
       {
         action: "talk",
-        text: "<speak><prosody volume='+6dB'><break time='2s'/>I'm sorry, I couldn't reach the recipient. Please leave a message after the tone. Press the pound key when finished.</prosody></speak>",
-        language: "en-GB"
+        text: "<speak><break time='2s'/>I'm sorry, I couldn't reach the recipient. Please leave a message after the tone. Press the pound key when finished.</speak>",
+        language: "en-GB",
+        style: 0
       },
       {
         action: "record",
@@ -16,18 +18,16 @@ export default function handler(req, res) {
         endOnSilence: 5,
         endOnKey: "#",
         beepStart: true,
-        eventUrl: [`${config.BASE_URL}/api/recording`],
-        transcription: {
-          eventUrl: [`${config.BASE_URL}/api/transcript`],
-          language: "en-GB"
-        }
+        eventUrl: [`${config.BASE_URL}/api/recording`]
       },
       {
         action: "talk",
-        text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
-        language: "en-GB"
+        text: "Your message has been recorded. Thank you. Goodbye.",
+        language: "en-GB",
+        style: 0
       }
     ]);
   }
+
   res.status(200).send();
 }
