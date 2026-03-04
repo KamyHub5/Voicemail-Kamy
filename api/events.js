@@ -1,22 +1,33 @@
+const Vonage = require("@vonage/server-sdk");
 const config = require("./config");
 
-module.exports = function handler(req, res) {
+const vonage = new Vonage({
+  apiKey: config.VONAGE_API_KEY,
+  apiSecret: config.VONAGE_API_SECRET,
+  applicationId: config.VONAGE_APP_ID,
+  privateKey: Buffer.from(config.VONAGE_PRIVATE_KEY)
+});
+
+module.exports = async function handler(req, res) {
   const body = req.method === "POST" ? req.body : req.query;
   const status = body.status;
-  const direction = body.direction;
-  const disconnectedBy = body.disconnected_by || body.disconnectedBy;
+  const uuid = body.uuid;
 
-  console.log("EVENT status:", status, "direction:", direction, "disconnectedBy:", disconnectedBy);
+  console.log("EVENT:", status, "UUID:", uuid);
 
-  // Outbound leg to Kamy timed out or was not answered
-  if (
-    (direction === "outbound" && status === "timeout") ||
-    (direction === "outbound" && status === "unanswered") ||
-    (direction === "outbound" && status === "failed") ||
-    (status === "completed" && disconnectedBy === "platform")
-  ) {
-    res.redirect(`${config.BASE_URL}/api/voicemail`);
-  } else {
-    res.status(200).json({ status: "ok" });
+  if (status === "unanswered" || status === "timeout" || status === "failed" || status === "rejected") {
+    // Actively redirect the inbound call to voicemail using REST API
+    vonage.calls.update(uuid, {
+      action: "transfer",
+      destination: {
+        type: "ncco",
+        url: [`${config.BASE_URL}/api/voicemail`]
+      }
+    }, (err, resp) => {
+      if (err) console.error("Transfer error:", JSON.stringify(err));
+      else console.log("Transferred to voicemail:", JSON.stringify(resp));
+    });
   }
+
+  res.status(200).json({ status: "ok" });
 };
