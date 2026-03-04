@@ -1,15 +1,15 @@
-const config = require("./config");
+import config from "./config.js";
 
-module.exports = function handler(req, res) {
-  const body = req.method === "POST" ? req.body : req.query;
+export default function handler(req, res) {
+  const body = req.body;
   const digit = body.dtmf?.digits || body.digits || "";
 
   if (digit === "*") {
     res.status(200).json([
       {
         action: "talk",
-        text: "<speak><prosody volume='x-loud'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</prosody></speak>",
-        language: "en-GB"
+        text: "<speak><prosody volume='+6dB'><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
+        voiceName: "Kimberly"
       },
       {
         action: "record",
@@ -21,8 +21,8 @@ module.exports = function handler(req, res) {
       },
       {
         action: "talk",
-        text: "<speak><prosody volume='x-loud'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
-        language: "en-GB"
+        text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.</prosody></speak>",
+        voiceName: "Kimberly"
       }
     ]);
   } else {
@@ -30,10 +30,10 @@ module.exports = function handler(req, res) {
       {
         action: "connect",
         timeout: 15,
-        from: "13105151321",
+        from: config.VONAGE_NUMBER,
         eventType: "synchronous",
         eventUrl: [`${config.BASE_URL}/api/outbound-events`],
-        endpoint: [{ type: "phone", number: "13059827377" }]
+        endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
       }
     ]);
   }
