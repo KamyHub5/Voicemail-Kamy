@@ -33,7 +33,11 @@ zdwPD79QcDliX9egBiuiDw==
 
   const jwt = tokenGenerate(appId, privateKey);
 
+  // LOG EVERYTHING: We need to see what Vonage sends us
+  console.log("VOICE_EVENT:", JSON.stringify(req.body));
+
   try {
+    // Just fire the message. No .json() parsing to avoid the error.
     await fetch(`https://api.nexmo.com/v1/messages`, {
       method: 'POST',
       headers: {
@@ -49,8 +53,8 @@ zdwPD79QcDliX9egBiuiDw==
       })
     });
   } catch (err) {
-    console.error("SMS Error:", err.message);
+    console.log("Silent catch:", err.message);
   }
 
-  res.status(200).json({ status: "ok" });
+  res.status(200).send("OK");
 }
