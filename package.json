@@ -2,5 +2,7 @@
   "name": "kamy-vonage",
   "version": "1.0.0",
   "type": "module",
-  "dependencies": {}
+  "dependencies": {
+    "@vonage/jwt": "^1.0.0"
+  }
 }
