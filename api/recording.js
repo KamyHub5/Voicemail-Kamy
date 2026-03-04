@@ -1,6 +1,7 @@
 import { tokenGenerate } from '@vonage/jwt';
 
 export default async function handler(req, res) {
+  // 1. HARDCODED CONFIG
   const appId = "ecefa59a-3067-489d-b3cd-d0cef77dca53";
   const privateKey = `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCbKR+cEFKEphE9
@@ -31,36 +32,34 @@ FbQG8nBdhMpBOOdb+RVH+/4Uny6nCLGZJTICFmrq/lDmo24/Nx7YXT+TUyFAcTuB
 zdwPD79QcDliX9egBiuiDw==
 -----END PRIVATE KEY-----`;
 
-  const body = req.body || {};
+  const jwt = tokenGenerate(appId, privateKey);
   
-  // LOG EVERYTHING: This is how we prove Vonage is calling
-  console.log("VOICE_EVENT_RECEIVED:", JSON.stringify(body));
+  // LOG EVERYTHING - We need to see what's happening
+  console.log("LOG: Webhook Triggered with body:", JSON.stringify(req.body));
 
-  // If this is a recording event, trigger the SMS
-  if (body.recording_url || body.status === 'completed') {
-    try {
-      const jwt = tokenGenerate(appId, privateKey);
-      const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwt}`
-        },
-        body: JSON.stringify({
-          message_type: 'text',
-          text: `Voicemail Alert: Call from ${body.from || 'Unknown'} has ended.`,
-          to: "13059827377",
-          from: "13105151321",
-          channel: 'sms'
-        })
-      });
+  try {
+    // 2. IMMEDIATE SMS ATTEMPT
+    const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
+      },
+      body: JSON.stringify({
+        message_type: 'text',
+        text: "hi, new voicemail",
+        to: "13059827377",
+        from: "13105151321",
+        channel: 'sms'
+      })
+    });
 
-      const smsData = await smsRes.json();
-      console.log("SMS_SENT_RESULT:", JSON.stringify(smsData));
-    } catch (err) {
-      console.error("SMS_FAILED:", err.message);
-    }
+    const smsData = await smsRes.json();
+    console.log("LOG: Vonage API Result:", JSON.stringify(smsData));
+  } catch (err) {
+    console.error("LOG: SMS Failure:", err.message);
   }
 
+  // Always tell Vonage we received it so it stops trying
   res.status(200).json({ status: "ok" });
 }
