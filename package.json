@@ -2,8 +2,21 @@
   "name": "kamy-vonage",
   "version": "1.0.0",
   "type": "module",
-  "dependencies": {
-    "@vonage/server-sdk": "3.15.0",
-    "@vonage/jwt": "1.0.3"
-  }
+  "dependencies": {}
 }
+```
+
+---
+
+Repo structure:
+```
+voicemail-kamy/
+├── api/
+│   ├── config.js
+│   ├── answer.js
+│   ├── keypress.js
+│   ├── outbound-events.js
+│   ├── events.js
+│   └── recording.js
+├── vercel.json
+└── package.json
