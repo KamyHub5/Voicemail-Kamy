@@ -16,7 +16,11 @@ export default function handler(req, res) {
         endOnSilence: 5,
         endOnKey: "#",
         beepStart: true,
-        eventUrl: [`${config.BASE_URL}/api/recording`]
+        eventUrl: [`${config.BASE_URL}/api/recording`],
+        transcription: {
+          eventUrl: [`${config.BASE_URL}/api/transcript`],
+          language: "en-GB"
+        }
       },
       {
         action: "talk",
@@ -26,4 +30,4 @@ export default function handler(req, res) {
     ]);
   }
   res.status(200).send();
-};
+}
