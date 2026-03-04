@@ -6,7 +6,6 @@ module.exports = function handler(req, res) {
       action: "talk",
       text: "<speak><break time='2s'/>Hello. Thank you for calling. Please remain on the line to be connected, or press the star key to leave a voicemail.</speak>",
       language: "en-GB",
-      style: 0,
       bargeIn: true
     },
     {
