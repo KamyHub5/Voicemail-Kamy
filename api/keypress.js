@@ -32,7 +32,7 @@ module.exports = function handler(req, res) {
     res.status(200).json([
       {
         action: "connect",
-        timeout: 15,
+        timeout: 5,
         from: config.VONAGE_NUMBER,
         eventUrl: [`${config.BASE_URL}/api/events`],
         endpoint: [
