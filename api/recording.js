@@ -31,40 +31,33 @@ FbQG8nBdhMpBOOdb+RVH+/4Uny6nCLGZJTICFmrq/lDmo24/Nx7YXT+TUyFAcTuB
 zdwPD79QcDliX9egBiuiDw==
 -----END PRIVATE KEY-----`;
 
-  const jwt = tokenGenerate(appId, privateKey);
-  const body = req.body || {};
-  
-  console.log("LOG: Incoming Webhook Data:", JSON.stringify(body));
-
-  try {
-    const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwt}`
-      },
-      body: JSON.stringify({
-        message_type: 'text',
-        text: `Voicemail notification test.`,
-        to: "13059827377",
-        from: "13105151321",
-        channel: 'sms'
-      })
-    });
-
-    // CRITICAL FIX: Check content type before parsing
-    const contentType = smsRes.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      const smsData = await smsRes.json();
-      console.log("LOG: Success JSON:", JSON.stringify(smsData));
-    } else {
-      const errorText = await smsRes.text();
-      console.error(`LOG: Server returned HTML/Text (${smsRes.status}):`, errorText.substring(0, 500));
+  // --- BROWSER TEST TRIGGER ---
+  if (req.method === 'GET') {
+    console.log("LOG: Browser test triggered!");
+    try {
+      const jwt = tokenGenerate(appId, privateKey);
+      const testRes = await fetch(`https://api.nexmo.com/v1/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}`
+        },
+        body: JSON.stringify({
+          message_type: 'text',
+          text: "Manual Browser Test: If you see this, the code works!",
+          to: "13059827377",
+          from: "13105151321",
+          channel: 'sms'
+        })
+      });
+      const data = await testRes.json();
+      return res.status(200).json({ status: "Manual test sent", vonage_response: data });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
-
-  } catch (err) {
-    console.error("LOG: Execution Error:", err.message);
   }
+  // --- END BROWSER TEST TRIGGER ---
 
+  // (The rest of your normal webhook logic follows here)
   res.status(200).json({ status: "ok" });
 }
