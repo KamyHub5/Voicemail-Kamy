@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   console.log("Recording URL:", recordingUrl);
   console.log("Time:", timestamp);
 
-  // Send SMS to Kamy via Vonage
+  // Send SMS to Kamy
   try {
     const response = await fetch("https://rest.nexmo.com/sms/json", {
       method: "POST",
