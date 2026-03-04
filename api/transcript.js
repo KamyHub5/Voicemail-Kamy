@@ -13,13 +13,17 @@ export default async function handler(req, res) {
   
   if (body.text) {
     try {
-      await vonage.sms.send({
+      // Send Transcript using the MESSAGES API
+      await vonage.messages.send({
+        text: `Transcript: "${body.text}"`,
+        message_type: 'text',
         to: "13059827377",
         from: "13105151321",
-        text: `Transcript: "${body.text}"`
+        channel: 'sms'
       });
+      console.log("Transcript SMS sent via Messages API");
     } catch (err) {
-      console.error("Transcript SMS failed:", err);
+      console.error("Transcript SMS failed:", err.message);
     }
   }
   res.status(200).json({ status: "ok" });
