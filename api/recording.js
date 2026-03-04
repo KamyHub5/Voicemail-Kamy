@@ -1,6 +1,6 @@
-// v2
+// v3 
 
-import config from "./config.js";
+import confg from "./config.js";
 
 export default async function handler(req, res) {
   res.status(200).json({ status: "ok" });
