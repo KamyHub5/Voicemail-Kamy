@@ -1,7 +1,8 @@
 {
   "name": "kamy-vonage",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
-    "@vonage/server-sdk": "3.0.1"
+    "@vonage/server-sdk": "3.15.0"
   }
 }
