@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   
   if (body.recording_url) {
     try {
-      // 1. Fetch the private audio from Vonage
+      // 1. Fetch private audio from Vonage
       const audioBuffer = await vonage.files.get(body.recording_url);
       
       // 2. Upload to file.io
@@ -25,15 +25,20 @@ export default async function handler(req, res) {
       const fileData = await fileRes.json();
       const easyLink = fileData.link || body.recording_url;
 
-      // 3. Send the SMS
-      await vonage.sms.send({
+      const dateStr = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+      
+      // 3. Send SMS using the MESSAGES API (Required for your current settings)
+      await vonage.messages.send({
+        text: `Voicemail Alert!\nFrom: ${body.from || 'Unknown'}\nTime: ${dateStr}\nListen: ${easyLink}\n(Transcript to follow...)`,
+        message_type: 'text',
         to: "13059827377",
         from: "13105151321",
-        text: `New Voicemail\nLink: ${easyLink}\n(Transcript coming...)`
+        channel: 'sms'
       });
+      console.log("Recording SMS sent via Messages API");
 
     } catch (err) {
-      console.error("SMS/Upload Failed:", err.message);
+      console.error("Recording process failed:", err.message);
     }
   }
   res.status(200).json({ status: "ok" });
