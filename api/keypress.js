@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────
-// KEYPRESS — triggered when caller presses a key during greeting
-// Star (*) → redirect to voicemail
-// Anything else → proceed to connect Kamy's phone
-// ─────────────────────────────────────────────
-
 const config = require("./config");
 
 module.exports = function handler(req, res) {
@@ -11,22 +5,67 @@ module.exports = function handler(req, res) {
   const digit = body.dtmf?.digits || body.digits || "";
 
   if (digit === "*") {
-    // Caller pressed star — send to voicemail
-    res.redirect(`${config.BASE_URL}/api/voicemail`);
+    // Star pressed — go straight to voicemail
+    res.status(200).json([
+      {
+        action: "talk",
+        text: "<speak><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
+        language: "en-GB",
+        style: 0
+      },
+      {
+        action: "record",
+        format: "mp3",
+        endOnSilence: 5,
+        endOnKey: "#",
+        timeOut: 25,
+        beepStart: true,
+        eventUrl: [`${config.BASE_URL}/api/recording`]
+      },
+      {
+        action: "talk",
+        text: "Your message has been recorded. Thank you. Goodbye.",
+        language: "en-GB",
+        style: 0
+      }
+    ]);
   } else {
-    // No star pressed — connect to Kamy's phone
+    // No key or wrong key — connect to Kamy
     res.status(200).json([
       {
         action: "connect",
-        timeout: 15,
+        timeout: 3,
         from: config.VONAGE_NUMBER,
         eventUrl: [`${config.BASE_URL}/api/events`],
+        eventMethod: "POST",
         endpoint: [
           {
             type: "phone",
             number: config.KAMY_NUMBER
           }
         ]
+      },
+      {
+        // This runs if connect times out or fails
+        action: "talk",
+        text: "<speak><break time='2s'/>Please leave a message at the tone. Press the pound key when finished.</speak>",
+        language: "en-GB",
+        style: 0
+      },
+      {
+        action: "record",
+        format: "mp3",
+        endOnSilence: 5,
+        endOnKey: "#",
+        timeOut: 25,
+        beepStart: true,
+        eventUrl: [`${config.BASE_URL}/api/recording`]
+      },
+      {
+        action: "talk",
+        text: "Your message has been recorded. Thank you. Goodbye.",
+        language: "en-GB",
+        style: 0
       }
     ]);
   }
