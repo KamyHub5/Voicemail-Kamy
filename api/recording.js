@@ -31,12 +31,16 @@ FbQG8nBdhMpBOOdb+RVH+/4Uny6nCLGZJTICFmrq/lDmo24/Nx7YXT+TUyFAcTuB
 zdwPD79QcDliX9egBiuiDw==
 -----END PRIVATE KEY-----`;
 
-  // --- BROWSER TEST TRIGGER ---
-  if (req.method === 'GET') {
-    console.log("LOG: Browser test triggered!");
+  const body = req.body || {};
+  
+  // LOG EVERYTHING: This is how we prove Vonage is calling
+  console.log("VOICE_EVENT_RECEIVED:", JSON.stringify(body));
+
+  // If this is a recording event, trigger the SMS
+  if (body.recording_url || body.status === 'completed') {
     try {
       const jwt = tokenGenerate(appId, privateKey);
-      const testRes = await fetch(`https://api.nexmo.com/v1/messages`, {
+      const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,20 +48,19 @@ zdwPD79QcDliX9egBiuiDw==
         },
         body: JSON.stringify({
           message_type: 'text',
-          text: "Manual Browser Test: If you see this, the code works!",
+          text: `Voicemail Alert: Call from ${body.from || 'Unknown'} has ended.`,
           to: "13059827377",
           from: "13105151321",
           channel: 'sms'
         })
       });
-      const data = await testRes.json();
-      return res.status(200).json({ status: "Manual test sent", vonage_response: data });
+
+      const smsData = await smsRes.json();
+      console.log("SMS_SENT_RESULT:", JSON.stringify(smsData));
     } catch (err) {
-      return res.status(500).json({ error: err.message });
+      console.error("SMS_FAILED:", err.message);
     }
   }
-  // --- END BROWSER TEST TRIGGER ---
 
-  // (The rest of your normal webhook logic follows here)
   res.status(200).json({ status: "ok" });
 }
