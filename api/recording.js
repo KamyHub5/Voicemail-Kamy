@@ -1,20 +1,17 @@
 import config from './config.js';
 
 export default async function handler(req, res) {
-  const auth = Buffer.from(`${config.VONAGE_API_KEY}:${config.VONAGE_API_SECRET}`).toString('base64');
+  // Use Query Params for Auth - this bypasses the "Invalid Token" header issue
+  const authQuery = `api_key=${config.VONAGE_API_KEY}&api_secret=${config.VONAGE_API_SECRET}`;
 
-  // BROWSER TEST: Visit https://voicemail-kamy.vercel.app/api/recording
   if (req.method === 'GET') {
     try {
-      const testRes = await fetch(`https://api.nexmo.com/v1/messages`, {
+      const testRes = await fetch(`https://api.nexmo.com/v1/messages?${authQuery}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${auth}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message_type: 'text',
-          text: "Diagnostic Test: If you see this, the API connection is good.",
+          text: "Diagnostic Test: Auth Fixed",
           to: config.KAMY_NUMBER,
           from: config.VONAGE_NUMBER,
           channel: 'sms'
@@ -22,46 +19,40 @@ export default async function handler(req, res) {
       });
 
       const result = await testRes.json();
-      return res.status(200).json({
-        message: "Vonage API Response Received",
-        raw_response: result
-      });
+      return res.status(200).json({ status: "Attempted", response: result });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   }
 
-  // REAL WEBHOOK LOGIC: (When Vonage calls this after a voicemail)
   const body = req.body || {};
   if (body.recording_url) {
     try {
-      const audioRes = await fetch(body.recording_url, {
-        headers: { 'Authorization': `Basic ${auth}` }
-      });
+      // 1. Download audio using Query Auth
+      const audioRes = await fetch(`${body.recording_url}?${authQuery}`);
       const audioBuffer = await audioRes.arrayBuffer();
 
+      // 2. Upload to file.io
       const fileRes = await fetch('https://file.io/?expires=1d', {
         method: 'POST',
         body: Buffer.from(audioBuffer)
       });
       const fileData = await fileRes.json();
 
-      await fetch(`https://api.nexmo.com/v1/messages`, {
+      // 3. Send SMS using Query Auth
+      await fetch(`https://api.nexmo.com/v1/messages?${authQuery}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${auth}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message_type: 'text',
-          text: `New Voicemail!\nListen: ${fileData.link || "Error uploading"}`,
+          text: `New Voicemail!\nListen: ${fileData.link || "Error"}`,
           to: config.KAMY_NUMBER,
           from: config.VONAGE_NUMBER,
           channel: 'sms'
         })
       });
     } catch (err) {
-      console.error("Recording error:", err.message);
+      console.error("Process error:", err.message);
     }
   }
   return res.status(200).json({ status: "ok" });
