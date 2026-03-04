@@ -2,15 +2,17 @@ import config from './config.js';
 import { tokenGenerate } from '@vonage/jwt';
 
 export default async function handler(req, res) {
-  const jwt = tokenGenerate(config.VONAGE_APP_ID, config.VONAGE_PRIVATE_KEY);
+  // 1. Generate the JWT token for authentication
+  const jwt = tokenGenerate("ecefa59a-3067-489d-b3cd-d0cef77dca53", config.VONAGE_PRIVATE_KEY);
+
   const body = req.body || {};
   
-  // Log the body so we can see exactly what Vonage is sending in Vercel
+  // This will show up in your Vercel logs so we can see what Vonage is sending
   console.log("Incoming Webhook Body:", JSON.stringify(body));
 
   if (body.recording_url || body.status === 'completed') {
     try {
-      // Send a simple SMS immediately
+      // 2. Send the SMS attempt with hardcoded numbers
       const smsRes = await fetch(`https://api.nexmo.com/v1/messages`, {
         method: 'POST',
         headers: {
@@ -19,9 +21,9 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           message_type: 'text',
-          text: `Voicemail Alert!\nFrom: ${body.from || 'Unknown'}\nStatus: Call Finished.`,
-          to: config.KAMY_NUMBER,
-          from: config.VONAGE_NUMBER,
+          text: `Voicemail Alert!\nFrom: ${body.from || 'Unknown'}\nStatus: Call Finished. Check Vonage logs if this arrived.`,
+          to: "13059827377",
+          from: "13105151321",
           channel: 'sms'
         })
       });
