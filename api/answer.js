@@ -17,7 +17,7 @@ module.exports = function handler(req, res) {
     },
     {
       action: "connect",
-      timeout: 15,
+      timeout: 3,
       from: config.VONAGE_NUMBER,
       eventUrl: [`${config.BASE_URL}/api/events`],
       eventMethod: "POST",
