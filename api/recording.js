@@ -42,16 +42,15 @@ zdwPD79QcDliX9egBiuiDw==
       },
       body: JSON.stringify({
         message_type: 'text',
-        text: "hi, new voicemail",
+        text: "hi",
         to: "13059827377",
         from: "13105151321",
         channel: 'sms'
       })
     });
-  } catch (err) {
-    // Silent catch
+  } catch (e) {
+    // Ignore errors
   }
 
-  res.setHeader('Content-Type', 'text/plain');
   res.status(200).send("OK");
 }
