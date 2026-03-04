@@ -21,7 +21,7 @@ module.exports = function handler(req, res) {
       // If nothing pressed → falls through to connect
       action: "input",
       type: ["dtmf"],
-      dtmf: { timeOut: 5, maxDigits: 1 },
+      dtmf: { timeOut: 1, maxDigits: 1 },
       eventUrl: [`${config.BASE_URL}/api/keypress`]
     },
     {
