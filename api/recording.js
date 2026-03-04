@@ -14,8 +14,10 @@ export default async function handler(req, res) {
   
   if (body.recording_url) {
     try {
+      // 1. Fetch the private audio from Vonage
       const audioBuffer = await vonage.files.get(body.recording_url);
       
+      // 2. Upload to file.io
       const fileRes = await fetch('https://file.io/?expires=1d', {
         method: 'POST',
         body: audioBuffer
@@ -23,21 +25,15 @@ export default async function handler(req, res) {
       const fileData = await fileRes.json();
       const easyLink = fileData.link || body.recording_url;
 
-      const dateStr = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-      const textBody = `Voicemail Alert!
-From: ${body.from || 'Unknown'}
-Time: ${dateStr}
-Listen: ${easyLink}
-(Transcript to follow...)`;
-
+      // 3. Send the SMS
       await vonage.sms.send({
         to: "13059827377",
         from: "13105151321",
-        text: textBody
+        text: `New Voicemail\nLink: ${easyLink}\n(Transcript coming...)`
       });
 
     } catch (err) {
-      console.error("Recording logic failed:", err);
+      console.error("SMS/Upload Failed:", err.message);
     }
   }
   res.status(200).json({ status: "ok" });
