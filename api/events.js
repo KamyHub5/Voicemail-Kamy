@@ -1,33 +1,20 @@
-const Vonage = require("@vonage/server-sdk");
-const config = require("./config");
+import config from "./config.js";
 
-const vonage = new Vonage({
-  apiKey: config.VONAGE_API_KEY,
-  apiSecret: config.VONAGE_API_SECRET,
-  applicationId: config.VONAGE_APP_ID,
-  privateKey: Buffer.from(config.VONAGE_PRIVATE_KEY)
-});
-
-module.exports = async function handler(req, res) {
-  const body = req.method === "POST" ? req.body : req.query;
+export default function handler(req, res) {
+  // Use POST body for data as configured in your Vonage dashboard
+  const body = req.body || {};
   const status = body.status;
-  const uuid = body.uuid;
+  const disconnectedBy = body.disconnected_by || body.disconnectedBy;
 
-  console.log("EVENT:", status, "UUID:", uuid);
+  console.log("CALL EVENT:", status, "| Disconnected by:", disconnectedBy);
 
-  if (status === "unanswered" || status === "timeout" || status === "failed" || status === "rejected") {
-    // Actively redirect the inbound call to voicemail using REST API
-    vonage.calls.update(uuid, {
-      action: "transfer",
-      destination: {
-        type: "ncco",
-        url: [`${config.BASE_URL}/api/voicemail`]
-      }
-    }, (err, resp) => {
-      if (err) console.error("Transfer error:", JSON.stringify(err));
-      else console.log("Transferred to voicemail:", JSON.stringify(resp));
-    });
+  // Fallback logic for unanswered calls if synchronous outbound fails
+  if (
+    ["timeout", "failed", "rejected", "unanswered"].includes(status) ||
+    (status === "completed" && disconnectedBy === "platform")
+  ) {
+    res.redirect(`${config.BASE_URL}/api/voicemail`);
+  } else {
+    res.status(200).json({ status: "ok" });
   }
-
-  res.status(200).json({ status: "ok" });
-};
+}
