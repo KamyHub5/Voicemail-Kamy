@@ -28,7 +28,7 @@ module.exports = function handler(req, res) {
       // Step 3: Forward call to Kamy's phone
       // If no answer in 15s → events.js handles redirect to voicemail
       action: "connect",
-      timeout: 15,
+      timeout: 5,
       from: config.VONAGE_NUMBER,
       eventUrl: [`${config.BASE_URL}/api/events`],
       endpoint: [
