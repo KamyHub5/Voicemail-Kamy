@@ -1,5 +1,3 @@
-import config from "./config.js";
-
 export default function handler(req, res) {
   res.status(200).json([
     {
@@ -12,7 +10,7 @@ export default function handler(req, res) {
       action: "input",
       type: ["dtmf"],
       dtmf: { timeOut: 5, maxDigits: 1 },
-      eventUrl: [`${config.BASE_URL}/api/keypress`],
+      eventUrl: ["https://voicemail-kamy.vercel.app/api/keypress"],
       eventMethod: "POST"
     }
   ]);
