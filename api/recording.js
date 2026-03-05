@@ -2,9 +2,10 @@ import config from "./config.js";
 
 export default async function handler(req, res) {
   const body = req.body || {};
+  const query = req.query || {};
   const recordingUrl = body.recording_url;
   const startTime = body.start_time;
-  const callerNumber = body.from;
+  const callerNumber = query.from || "Unknown";
 
   console.log("Recording webhook body:", JSON.stringify(body));
 
