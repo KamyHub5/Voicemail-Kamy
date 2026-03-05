@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@vonage/jwt": "^1.0.0",
-    "jsonwebtoken": "^9.0.2"
+    "@vonage/jwt": "^1.0.0"
   }
 }
