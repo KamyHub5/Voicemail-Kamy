@@ -32,7 +32,7 @@ zdwPD79QcDliX9egBiuiDw==
 -----END PRIVATE KEY-----`,
   BASE_URL: "https://voicemail-kamy.vercel.app",
   VONAGE_NUMBER: "13105151321",
-  KAMY_NUMBER: "13059827377"
+  KAMY_NUMBER: "13059827377",
   DISROOT_USER: "fynk",
   DISROOT_PASS: "Grootguard25",
 };
