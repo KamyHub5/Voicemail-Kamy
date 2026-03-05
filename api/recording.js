@@ -34,8 +34,13 @@ export default async function handler(req, res) {
     const publicUrl = await uploadRes.text();
     console.log("Catbox URL:", publicUrl);
 
+    // Format date and time
+    const date = new Date(startTime);
+    const formattedDate = date.toLocaleDateString("en-US", { timeZone: "America/New_York" });
+    const formattedTime = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "America/New_York" });
+
     // Send SMS
-    const text = `New voicemail from ${callerNumber} at ${startTime}. Listen: ${publicUrl.trim()}`;
+    const text = `New voicemail From: ${callerNumber} Date: ${formattedDate} Time: ${formattedTime} ET Listen: ${publicUrl.trim()}`;
     const smsUrl = `https://rest.nexmo.com/sms/json?api_key=${config.VONAGE_API_KEY}&api_secret=${config.VONAGE_API_SECRET}&from=${config.VONAGE_NUMBER}&to=${config.KAMY_NUMBER}&text=${encodeURIComponent(text)}`;
     const smsResponse = await fetch(smsUrl);
     const smsResult = await smsResponse.text();
@@ -44,7 +49,7 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error("Error:", err.message);
     // Fallback SMS
-    const text = `New voicemail from ${callerNumber} at ${startTime}.`;
+    const text = `New voicemail From: ${callerNumber} Date: ${startTime}`;
     const smsUrl = `https://rest.nexmo.com/sms/json?api_key=${config.VONAGE_API_KEY}&api_secret=${config.VONAGE_API_SECRET}&from=${config.VONAGE_NUMBER}&to=${config.KAMY_NUMBER}&text=${encodeURIComponent(text)}`;
     await fetch(smsUrl);
   }
