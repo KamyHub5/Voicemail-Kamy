@@ -1,4 +1,9 @@
+import config from "./config.js";
+
 export default function handler(req, res) {
+  const body = req.body || req.query;
+  const callerNumber = body.from;
+
   res.status(200).json([
     {
       action: "talk",
@@ -10,7 +15,7 @@ export default function handler(req, res) {
       action: "input",
       type: ["dtmf"],
       dtmf: { timeOut: 5, maxDigits: 1 },
-      eventUrl: ["https://voicemail-kamy.vercel.app/api/keypress"],
+      eventUrl: [`${config.BASE_URL}/api/keypress?from=${callerNumber}`],
       eventMethod: "POST"
     }
   ]);
