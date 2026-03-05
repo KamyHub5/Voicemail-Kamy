@@ -1,8 +1,6 @@
 import config from "./config.js";
 
 export default async function handler(req, res) {
-  res.status(200).json({ status: "ok" });
-
   const body = req.body || {};
   const recordingUrl = body.recording_url;
   const startTime = body.start_time;
@@ -19,4 +17,6 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error("Error:", err.message);
   }
+
+  res.status(200).json({ status: "ok" });
 }
