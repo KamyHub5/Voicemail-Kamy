@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   const callerNumber = query.from || "Unknown";
 
   console.log("Recording webhook body:", JSON.stringify(body));
+  console.log("Query params:", JSON.stringify(query));
 
   try {
     const text = `New voicemail from ${callerNumber} at ${startTime}. Recording: ${recordingUrl}`;
