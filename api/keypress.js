@@ -2,7 +2,9 @@ import config from "./config.js";
 
 export default function handler(req, res) {
   const body = req.body || {};
+  const query = req.query || {};
   const digit = body.dtmf?.digits || body.digits || "";
+  const callerNumber = query.from || body.from || "Unknown";
 
   if (digit === "*") {
     return res.status(200).json([
@@ -18,12 +20,12 @@ export default function handler(req, res) {
         endOnKey: "#",
         timeOut: 25,
         beepStart: true,
-        eventUrl: [`${config.BASE_URL}/api/recording`],
+        eventUrl: [`${config.BASE_URL}/api/recording?from=${callerNumber}`],
         eventMethod: "POST"
       },
       {
         action: "talk",
-        text: "Your message has been recorded. Thank you. Goodbye.",
+        text: "<speak><prosody volume='+6dB'>Your message has been recorded. Thank you. Goodbye.",
         language: "en-GB"
       }
     ]);
@@ -34,7 +36,7 @@ export default function handler(req, res) {
       action: "connect",
       from: config.VONAGE_NUMBER,
       timeout: 15,
-      eventUrl: [`${config.BASE_URL}/api/outbound-events`],
+      eventUrl: [`${config.BASE_URL}/api/outbound-events?from=${callerNumber}`],
       eventMethod: "POST",
       eventType: "synchronous",
       endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
