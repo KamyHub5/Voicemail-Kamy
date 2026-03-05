@@ -26,21 +26,51 @@ export default async function handler(req, res) {
     const formData = new FormData();
     formData.append("reqtype", "fileupload");
     formData.append("fileToUpload", new Blob([audioBuffer], { type: "audio/mpeg" }), "voicemail.mp3");
-
     const uploadRes = await fetch("https://catbox.moe/user/api.php", {
       method: "POST",
       body: formData
     });
-    const publicUrl = await uploadRes.text();
-    console.log("Catbox URL:", publicUrl);
+    const catboxUrl = await uploadRes.text();
+    console.log("Catbox URL:", catboxUrl);
+
+    // Upload to Disroot (Nextcloud WebDAV)
+    const filename = `voicemail_${Date.now()}.mp3`;
+    const disrootUrl = `https://cloud.disroot.org/remote.php/dav/files/${config.DISROOT_USER}/Voicemails/${filename}`;
+    const credentials = Buffer.from(`${config.DISROOT_USER}:${config.DISROOT_PASS}`).toString("base64");
+    
+    const disrootUpload = await fetch(disrootUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "audio/mpeg"
+      },
+      body: audioBuffer
+    });
+    console.log("Disroot upload status:", disrootUpload.status);
+
+    // Create public share link on Disroot
+    const shareRes = await fetch(`https://cloud.disroot.org/ocs/v2.php/apps/files_sharing/api/v1/shares`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "OCS-APIRequest": "true"
+      },
+      body: `path=/Voicemails/${filename}&shareType=3`
+    });
+    const shareText = await shareRes.text();
+    console.log("Disroot share response:", shareText);
+    const shareMatch = shareText.match(/<url>(.*?)<\/url>/);
+    const disrootShareUrl = shareMatch ? shareMatch[1] : null;
+    console.log("Disroot share URL:", disrootShareUrl);
 
     // Format date and time
     const date = new Date(startTime);
     const formattedDate = date.toLocaleDateString("en-US", { timeZone: "America/New_York" });
-    const formattedTime = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "America/New_York" });
+    const formattedTime = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/New_York" });
 
     // Send SMS
-    const text = `New voicemail From: ${callerNumber} Date: ${formattedDate} Time: ${formattedTime} ET Listen: ${publicUrl.trim()}`;
+    const text = `New voicemail From: ${callerNumber} Date: ${formattedDate} Time: ${formattedTime} ET Listen: ${catboxUrl.trim()}${disrootShareUrl ? " Backup: " + disrootShareUrl : ""}`;
     const smsUrl = `https://rest.nexmo.com/sms/json?api_key=${config.VONAGE_API_KEY}&api_secret=${config.VONAGE_API_SECRET}&from=${config.VONAGE_NUMBER}&to=${config.KAMY_NUMBER}&text=${encodeURIComponent(text)}`;
     const smsResponse = await fetch(smsUrl);
     const smsResult = await smsResponse.text();
@@ -48,7 +78,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error("Error:", err.message);
-    // Fallback SMS
     const text = `New voicemail From: ${callerNumber} Date: ${startTime}`;
     const smsUrl = `https://rest.nexmo.com/sms/json?api_key=${config.VONAGE_API_KEY}&api_secret=${config.VONAGE_API_SECRET}&from=${config.VONAGE_NUMBER}&to=${config.KAMY_NUMBER}&text=${encodeURIComponent(text)}`;
     await fetch(smsUrl);
