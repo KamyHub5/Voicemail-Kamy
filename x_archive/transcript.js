@@ -1,3 +1,8 @@
+// TRANSCRIPT SMS SENDER
+// Used for: Sending voicemail text transcriptions to your mobile phone
+// Receives transcribed text payloads and sends them via Vonage Messages API
+
+
 import config from './config.js';
 import { tokenGenerate } from '@vonage/jwt';
 
