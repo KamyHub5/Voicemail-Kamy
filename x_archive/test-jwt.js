@@ -1,4 +1,3 @@
-
 // JWT & DOWNLOAD TESTER
 // Used for: Diagnostic testing of Vonage App credentials and JWT generation
 // Allows testing recording downloads via ?url= query parameter
