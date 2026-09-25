@@ -1,12 +1,5 @@
 # Vonage Voicemail Project
 
-<!-- ─────────────────────────────────────────────
-     PROJECT DOCUMENTATION
-     File: /README.md
-     Purpose: Provides a complete overview, architecture details,
-              file structure, and deployment instructions for the system.
-     ───────────────────────────────────────────── -->
-
 # Kamy Vonage Voicemail System
 
 A serverless voice call handling, call forwarding, and voicemail recording service built with **Vonage Voice API** and hosted on **Vercel**.
