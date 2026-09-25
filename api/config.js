@@ -1,3 +1,7 @@
+// SYSTEM CONFIGURATION
+// Purpose: Stores environment credentials, API keys, phone numbers,
+//          and server URL configurations used across all API handlers
+
 export default {
   VONAGE_API_KEY: "7bfc838f",
   VONAGE_API_SECRET: "KamyVonage2026",
