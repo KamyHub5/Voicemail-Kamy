@@ -1,4 +1,6 @@
-//v2
+// INBOUND CALL ANSWER HANDLER
+// Triggered by: Incoming calls to your Vonage phone number
+// Purpose: Plays initial greeting message and listens for keypad press (*)
 
 import config from "./config.js";
 
