@@ -1,3 +1,8 @@
+// VOICEMAIL PROCESSOR & SMS NOTIFIER
+// Triggered by: Completion of a call recording
+// Purpose: Downloads audio from Vonage, uploads to Catbox and Disroot storage,
+//          and sends SMS notification with download links
+
 import config from "./config.js";
 import { tokenGenerate } from "@vonage/jwt";
 
