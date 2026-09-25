@@ -3,7 +3,7 @@
 // Purpose: Downloads audio from Vonage, uploads to Catbox and Disroot storage,
 //          and sends SMS notification with download links
 
-import config from "./config.js";
+import config from "../config.js";
 import { tokenGenerate } from "@vonage/jwt";
 
 export default async function handler(req, res) {
