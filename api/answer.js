@@ -2,7 +2,7 @@
 // Triggered by: Incoming calls to your Vonage phone number
 // Purpose: Plays initial greeting message and listens for keypad press (*)
 
-import config from "./config.js";
+import config from "../config.js";
 
 export default function handler(req, res) {
   const body = req.body || req.query;
