@@ -3,7 +3,7 @@
 // Purpose: Routes caller to voicemail if star (*) is pressed,
 //          otherwise attempts to connect call to your phone
 
-import config from "./config.js";
+import config from "../config.js";
 
 export default function handler(req, res) {
   const body = req.body || {};
