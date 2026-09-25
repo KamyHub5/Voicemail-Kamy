@@ -2,7 +2,7 @@
 // Triggered by: Status updates when connecting call to primary phone
 // Purpose: Fallback to voicemail prompt if line is busy, unanswered, or fails
 
-import config from "./config.js";
+import config from "../config.js";
 
 export default function handler(req, res) {
   const body = req.body || {};
