@@ -21,10 +21,10 @@ This project provides an automated interactive voice response (IVR) system:
 
 ```text
 ├── api/
-│   ├── answer.js          # Inbound call answer handler & greeting prompt
-│   ├── keypress.js        # Keypad router (* for voicemail, else connect)
-│   ├── outbound-events.js # Call connect failover & fallback to voicemail
-│   ├── recording.js       # Audio processor, cloud uploader, & SMS notifier
+│   ├── answer.js          **# Inbound call answer handler & greeting prompt**
+│   ├── keypress.js        **# Keypad router (* for voicemail, else connect)**
+│   ├── outbound-events.js **# Call connect failover & fallback to voicemail**
+│   ├── recording.js       **# Audio processor, cloud uploader, & SMS notifier**
 │   ├── events.js          # Voice call status event logger
 │   ├── inbound.js         # Inbound SMS message webhook handler
 │   └── status.js          # Outbound SMS delivery status tracker
