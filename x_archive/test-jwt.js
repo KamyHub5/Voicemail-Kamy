@@ -3,7 +3,7 @@
 // Allows testing recording downloads via ?url= query parameter
 
 
-import config from "./config.js";
+import config from "../config.js";
 import { tokenGenerate } from "@vonage/jwt";
 
 export default async function handler(req, res) {
