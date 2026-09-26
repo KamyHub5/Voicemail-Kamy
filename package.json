@@ -1,7 +1,4 @@
 {
-  "_title": "PROJECT MANIFEST (package.json)",
-  "_explanation": "Defines project metadata, enables modern ES Module imports across all endpoints, and installs @vonage/jwt for generating secure download tokens.",
-
   "name": "kamy-vonage",
   "version": "1.0.0",
   "type": "module",
