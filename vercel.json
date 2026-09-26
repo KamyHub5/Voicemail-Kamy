@@ -1,6 +1,3 @@
 {
-  "_title": "VERCEL DEPLOYMENT CONFIG (vercel.json)",
-  "_explanation": "Instructs Vercel to run Serverless Functions using build system version 2.",
-  
   "version": 2
 }
