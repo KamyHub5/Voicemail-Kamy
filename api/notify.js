@@ -22,10 +22,14 @@ export default async function handler(req, res) {
       }
     });
 
-    await transporter.sendMail({
-      from: `"Voicemail Notification" <${config.DISROOT_USER}>`, 
-      to: config.NOTIFY_EMAIL,
-      subject: "New Voicemail",
+await transporter.sendMail({
+  from: `"Voicemail Notification" <${config.DISROOT_USER}>`,
+  to: config.NOTIFY_EMAIL,
+  envelope: {
+    from: config.DISROOT_USER,
+    to: config.NOTIFY_EMAIL
+  },
+  subject: "New Voicemail",
       text:
 `New voicemail
 
