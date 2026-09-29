@@ -15,11 +15,11 @@ export default async function handler(req, res) {
       host: "disroot.org",
       port: 587,
       secure: false,
+      requireTLS: true,
       auth: {
         user: config.DISROOT_USER,
         pass: config.DISROOT_PASS
-      },
-      requireTLS: true
+      }
     });
 
     await transporter.sendMail({
