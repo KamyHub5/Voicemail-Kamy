@@ -1,4 +1,5 @@
 import config from "../config.js";
+import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
   const {
@@ -10,7 +11,22 @@ export default async function handler(req, res) {
   } = req.body || {};
 
   try {
-    const text =
+    const transporter = nodemailer.createTransport({
+      host: "disroot.org",
+      port: 587,
+      secure: false,
+      auth: {
+        user: config.DISROOT_USER,
+        pass: config.DISROOT_PASS
+      },
+      requireTLS: true
+    });
+
+    await transporter.sendMail({
+      from: config.DISROOT_USER,
+      to: config.NOTIFY_EMAIL,
+      subject: "New Voicemail",
+      text:
 `New voicemail
 
 From: ${callerNumber}
@@ -21,27 +37,8 @@ Listen:
 ${litterboxUrl}
 
 Backup:
-${disrootShareUrl}`;
-
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${config.RESEND_API_KEY}`
-      },
-      body: JSON.stringify({
-        from: config.RESEND_FROM,
-        to: config.RESEND_TO,
-        subject: "New Voicemail",
-        text
-      })
+${disrootShareUrl}`
     });
-
-    const result = await response.text();
-
-    if (!response.ok) {
-      throw new Error(`Resend failed: ${result}`);
-    }
 
     console.log("Email notification sent");
 
