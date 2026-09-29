@@ -33,31 +33,30 @@ export default async function handler(req, res) {
 
 // Upload to Litterbox
     const formData = new FormData();
-
-    formData.append("reqtype", "fileupload");
-    formData.append("time", "72h");
-
-    formData.append(
-      "fileToUpload",
-      new Blob([audioBuffer], { type: "audio/mpeg" }),
-      "voicemail.mp3"
-    );
-
+    
+      formData.append("reqtype", "fileupload");
+      formData.append("time", "72h");
+    
+    const audioFile = new File(
+      [audioBuffer],
+      "voicemail.mp3",
+      { type: "audio/mpeg" }
+      );
+    
+    formData.append("fileToUpload", audioFile);
+    
     const uploadRes = await fetch(
       "https://litterbox.catbox.moe/resources/internals/api.php",
       {
         method: "POST",
         body: formData
       }
-    );
-
-const litterboxText = await uploadRes.text();
-
-console.log("Litterbox upload status:", uploadRes.status);
-console.log("Litterbox response headers:", Object.fromEntries(uploadRes.headers));
-console.log("Litterbox response:", litterboxText.substring(0, 500));
-
-const litterboxUrl = litterboxText.trim();
+      );
+    
+    const litterboxUrl = await uploadRes.text();
+    
+    console.log("Litterbox upload status:", uploadRes.status);
+    console.log("Litterbox URL:", litterboxUrl.trim());
 
 // Upload to Disroot (Nextcloud WebDAV)
     const filename = `voicemail_${Date.now()}.mp3`;
