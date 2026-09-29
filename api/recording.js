@@ -33,13 +33,16 @@ export default async function handler(req, res) {
 
 // Upload to Catbox
     const formData = new FormData();
-    formData.append("reqtype", "fileupload");
-    formData.append(
-      "fileToUpload",
-      new Blob([audioBuffer], { type: "audio/mpeg" }),
-      "voicemail.mp3"
+      formData.append("reqtype", "fileupload");
+
+    const audioFile = new File(
+      [audioBuffer],
+      "voicemail.mp3",
+      { type: "audio/mpeg" }
     );
 
+      formData.append("fileToUpload", audioFile);
+    
     const uploadRes = await fetch("https://catbox.moe/user/api.php", {
       method: "POST",
       body: formData
