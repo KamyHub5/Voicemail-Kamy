@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@vonage/jwt": "^1.0.0",
+    "@vonage/jwt": "^1.2.0",
     "nodemailer": "^7.0.6"
   }
 }
