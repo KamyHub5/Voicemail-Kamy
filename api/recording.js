@@ -49,6 +49,9 @@ const uploadRes = await fetch(
   "https://catbox.moe/user/api.php",
   {
     method: "POST",
+    headers: {
+      "User-Agent": "KamyVoicemail/1.0"
+    },
     body: formData
   }
 );
@@ -61,7 +64,7 @@ const catboxUrl = (await uploadRes.text()).trim();
 
 console.log("Catbox upload status:", uploadRes.status);
 console.log("Catbox URL:", catboxUrl);
-
+    
     // Upload to Disroot
     const filename = `voicemail_${Date.now()}.mp3`;
 
