@@ -41,4 +41,8 @@ zdwPD79QcDliX9egBiuiDw==
   DISROOT_USER: "fynk",
   DISROOT_PASS: "Grootguard25",
   CATBOX_USERHASH: "7b20ee72316b14b99ba234def",
+  
+  RESEND_API_KEY: "re_xxxxxxxxxxxxxxxxx",
+  RESEND_FROM: "onboarding@resend.dev",
+  RESEND_TO: "fynk@disroot.org",
 };
