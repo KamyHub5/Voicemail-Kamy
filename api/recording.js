@@ -32,11 +32,10 @@ export default async function handler(req, res) {
     const audioBuffer = await dlRes.arrayBuffer();
     console.log("Downloaded bytes:", audioBuffer.byteLength);
 
-    // Upload to Litterbox
+// Upload to Catbox
 const formData = new FormData();
 
 formData.append("reqtype", "fileupload");
-formData.append("time", "72h");
 
 const audioFile = new File(
   [audioBuffer],
@@ -47,7 +46,7 @@ const audioFile = new File(
 formData.append("fileToUpload", audioFile);
 
 const uploadRes = await fetch(
-  "https://litterbox.catbox.moe/resources/internals/api.php",
+  "https://catbox.moe/user/api.php",
   {
     method: "POST",
     body: formData
@@ -55,13 +54,13 @@ const uploadRes = await fetch(
 );
 
 if (!uploadRes.ok) {
-  throw new Error(`Litterbox upload failed: ${uploadRes.status}`);
+  throw new Error(`Catbox upload failed: ${uploadRes.status}`);
 }
 
-const litterboxUrl = (await uploadRes.text()).trim();
+const catboxUrl = (await uploadRes.text()).trim();
 
-console.log("Litterbox upload status:", uploadRes.status);
-console.log("Litterbox URL:", litterboxUrl);
+console.log("Catbox upload status:", uploadRes.status);
+console.log("Catbox URL:", catboxUrl);
 
     // Upload to Disroot
     const filename = `voicemail_${Date.now()}.mp3`;
