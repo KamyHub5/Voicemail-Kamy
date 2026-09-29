@@ -1,6 +1,5 @@
-// SMS AND EMAIIL NOTIFICATION SENDER
+// SMS SENDER
 // Standalone SMS notification function.
-// Standalone email notification function.
 
 import config from "../config.js";
 
