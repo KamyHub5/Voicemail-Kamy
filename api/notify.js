@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     });
 
 await transporter.sendMail({
-  from: `"Voicemail Notification" <${config.DISROOT_USER}>`,
+  from: `"Voicemail Notification" <${config.DISROOT_USER}@disroot.org>`,
   to: config.NOTIFY_EMAIL,
   envelope: {
     from: config.DISROOT_USER,
