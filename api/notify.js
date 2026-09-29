@@ -22,27 +22,23 @@ export default async function handler(req, res) {
       }
     });
 
-await transporter.sendMail({
-  from: `"Voicemail Notification" <${config.DISROOT_USER}@disroot.org>`,
-  to: config.NOTIFY_EMAIL,
-  envelope: {
+  await transporter.sendMail({
     from: config.DISROOT_USER,
-    to: config.NOTIFY_EMAIL
-  },
-  subject: "New Voicemail",
-      text:
-`New voicemail
-
-From: ${callerNumber}
-Date: ${formattedDate}
-Time: ${formattedTime} ET
-
-Listen:
-${litterboxUrl}
-
-Backup:
-${disrootShareUrl}`
-    });
+    to: config.NOTIFY_EMAIL,
+    subject: "New Voicemail",
+    text:
+  `New voicemail
+  
+  From: ${callerNumber}
+  Date: ${formattedDate}
+  Time: ${formattedTime} ET
+  
+  Listen:
+  ${litterboxUrl}
+  
+  Backup:
+  ${disrootShareUrl}`
+  });
 
     console.log("Email notification sent");
 
