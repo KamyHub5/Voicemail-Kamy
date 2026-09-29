@@ -31,27 +31,32 @@ export default async function handler(req, res) {
     const audioBuffer = await dlRes.arrayBuffer();
     console.log("Downloaded bytes:", audioBuffer.byteLength);
 
-// Upload to Catbox
+// Upload to Litterbox
     const formData = new FormData();
-    
-      formData.append("reqtype", "fileupload");
-      formData.append("userhash", config.CATBOX_USERHASH);
-    
+
+    formData.append("reqtype", "fileupload");
+    formData.append("time", "72h");
+
     const audioFile = new File(
       [audioBuffer],
       "voicemail.mp3",
       { type: "audio/mpeg" }
-      );
-    
-    formData.append("fileToUpload", audioFile);
-    
-    const uploadRes = await fetch("https://catbox.moe/user/api.php", {
-      method: "POST",
-      body: formData
-      });
+    );
 
-    const catboxUrl = await uploadRes.text();
-    console.log("Catbox URL:", catboxUrl);
+    formData.append("fileToUpload", audioFile);
+
+    const uploadRes = await fetch(
+      "https://litterbox.catbox.moe/resources/internals/api.php",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const litterboxUrl = await uploadRes.text();
+
+    console.log("Litterbox upload status:", uploadRes.status);
+    console.log("Litterbox URL:", litterboxUrl);
 
 // Upload to Disroot (Nextcloud WebDAV)
     const filename = `voicemail_${Date.now()}.mp3`;
@@ -117,7 +122,7 @@ export default async function handler(req, res) {
     console.log("Date:", formattedDate);
     console.log("Time:", formattedTime, "ET");
     console.log("Vonage recording URL:", recordingUrl);
-    console.log("Catbox URL:", catboxUrl.trim());
+    console.log("Litterbox URL:", litterboxUrl.trim());
     console.log("Disroot URL:", disrootShareUrl);
     console.log("=========================================");
 
