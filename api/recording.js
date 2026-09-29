@@ -1,6 +1,7 @@
 // VOICEMAIL PROCESSOR
 // Triggered by: Completion of a call recording
-// Purpose: Downloads audio from Vonage and uploads to Catbox and Disroot storage.
+// Purpose: Downloads audio from Vonage and uploads to Litterbox and Disroot,
+// then sends an email notification.
 
 import config from "../config.js";
 import { tokenGenerate } from "@vonage/jwt";
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
   console.log("Caller:", callerNumber);
 
   try {
-// Download from Vonage with JWT
+    // Download from Vonage with JWT
     const token = tokenGenerate(
       config.VONAGE_APP_ID,
       config.VONAGE_PRIVATE_KEY
@@ -31,34 +32,38 @@ export default async function handler(req, res) {
     const audioBuffer = await dlRes.arrayBuffer();
     console.log("Downloaded bytes:", audioBuffer.byteLength);
 
-// Upload to Litterbox
-    const formData = new FormData();
-    
-      formData.append("reqtype", "fileupload");
-      formData.append("time", "72h");
-    
-    const audioFile = new File(
-      [audioBuffer],
-      "voicemail.mp3",
-      { type: "audio/mpeg" }
-      );
-    
-    formData.append("fileToUpload", audioFile);
-    
-    const uploadRes = await fetch(
-      "https://litterbox.catbox.moe/resources/internals/api.php",
-      {
-        method: "POST",
-        body: formData
-      }
-      );
-    
-    const litterboxUrl = await uploadRes.text();
-    
-    console.log("Litterbox upload status:", uploadRes.status);
-    console.log("Litterbox URL:", litterboxUrl.trim());
+    // Upload to Litterbox
+const formData = new FormData();
 
-// Upload to Disroot (Nextcloud WebDAV)
+formData.append("reqtype", "fileupload");
+formData.append("time", "72h");
+
+const audioFile = new File(
+  [audioBuffer],
+  "voicemail.mp3",
+  { type: "audio/mpeg" }
+);
+
+formData.append("fileToUpload", audioFile);
+
+const uploadRes = await fetch(
+  "https://litterbox.catbox.moe/resources/internals/api.php",
+  {
+    method: "POST",
+    body: formData
+  }
+);
+
+if (!uploadRes.ok) {
+  throw new Error(`Litterbox upload failed: ${uploadRes.status}`);
+}
+
+const litterboxUrl = (await uploadRes.text()).trim();
+
+console.log("Litterbox upload status:", uploadRes.status);
+console.log("Litterbox URL:", litterboxUrl);
+
+    // Upload to Disroot
     const filename = `voicemail_${Date.now()}.mp3`;
 
     const disrootUrl =
@@ -80,7 +85,7 @@ export default async function handler(req, res) {
 
     console.log("Disroot upload status:", disrootUpload.status);
 
-// Create public share link on Disroot
+    // Create public share link on Disroot
     const shareRes = await fetch(
       "https://cloud.disroot.org/ocs/v2.php/apps/files_sharing/api/v1/shares",
       {
@@ -95,15 +100,10 @@ export default async function handler(req, res) {
     );
 
     const shareText = await shareRes.text();
-
-    console.log("Disroot share response:", shareText);
-
     const shareMatch = shareText.match(/<url>(.*?)<\/url>/);
     const disrootShareUrl = shareMatch ? shareMatch[1] : null;
 
-    console.log("Disroot share URL:", disrootShareUrl);
-
-// Log the Vonage recording information
+    // Format date and time
     const date = new Date(startTime);
 
     const formattedDate = date.toLocaleDateString("en-US", {
@@ -117,12 +117,27 @@ export default async function handler(req, res) {
       timeZone: "America/New_York"
     });
 
+    // Send email notification
+    await fetch(`${config.BASE_URL}/api/notify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        callerNumber,
+        formattedDate,
+        formattedTime,
+        litterboxUrl,
+        disrootShareUrl
+      })
+    });
+
+    // Log completion
     console.log("========== VOICEMAIL COMPLETE ==========");
     console.log("Caller:", callerNumber);
     console.log("Date:", formattedDate);
     console.log("Time:", formattedTime, "ET");
-    console.log("Vonage recording URL:", recordingUrl);
-    console.log("Litterbox URL:", litterboxUrl.trim());
+    console.log("Litterbox URL:", litterboxUrl);
     console.log("Disroot URL:", disrootShareUrl);
     console.log("=========================================");
 
