@@ -1,6 +1,6 @@
 // VOICEMAIL PROCESSOR
 // Triggered by: Completion of a call recording
-// Purpose: Downloads audio from Vonage and uploads to Litterbox and Disroot,
+// Purpose: Downloads audio from Vonage and uploads to Catbox and Disroot,
 // then sends an email notification.
 
 import config from "../config.js";
@@ -126,7 +126,7 @@ console.log("Catbox URL:", catboxUrl);
         callerNumber,
         formattedDate,
         formattedTime,
-        litterboxUrl,
+        catboxUrl,
         disrootShareUrl
       })
     });
@@ -136,7 +136,7 @@ console.log("Catbox URL:", catboxUrl);
     console.log("Caller:", callerNumber);
     console.log("Date:", formattedDate);
     console.log("Time:", formattedTime, "ET");
-    console.log("Litterbox URL:", litterboxUrl);
+    console.log("Catbox URL:", catboxUrl);
     console.log("Disroot URL:", disrootShareUrl);
     console.log("=========================================");
 
