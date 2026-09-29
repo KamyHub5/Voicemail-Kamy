@@ -51,10 +51,13 @@ export default async function handler(req, res) {
       }
     );
 
-    const litterboxUrl = await uploadRes.text();
+const litterboxText = await uploadRes.text();
 
-    console.log("Litterbox upload status:", uploadRes.status);
-    console.log("Litterbox URL:", litterboxUrl.trim());
+console.log("Litterbox upload status:", uploadRes.status);
+console.log("Litterbox response headers:", Object.fromEntries(uploadRes.headers));
+console.log("Litterbox response:", litterboxText.substring(0, 500));
+
+const litterboxUrl = litterboxText.trim();
 
 // Upload to Disroot (Nextcloud WebDAV)
     const filename = `voicemail_${Date.now()}.mp3`;
