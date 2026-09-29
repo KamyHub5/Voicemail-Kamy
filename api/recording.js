@@ -1,6 +1,6 @@
 // VOICEMAIL PROCESSOR
 // Triggered by: Completion of a call recording
-// Purpose: Downloads audio from Vonage and uploads to Catbox and Disroot,
+// Purpose: Downloads audio from Vonage and uploads to Catbox/Litterbox and Disroot,
 // then sends an email notification.
 
 import config from "../config.js";
@@ -31,11 +31,12 @@ export default async function handler(req, res) {
 
     const audioBuffer = await dlRes.arrayBuffer();
     console.log("Downloaded bytes:", audioBuffer.byteLength);
-
+    
 // Upload to Catbox
 const formData = new FormData();
 
 formData.append("reqtype", "fileupload");
+formData.append("time", "72h");
 
 const audioFile = new File(
   [audioBuffer],
@@ -46,24 +47,21 @@ const audioFile = new File(
 formData.append("fileToUpload", audioFile);
 
 const uploadRes = await fetch(
-  "https://catbox.moe/user/api.php",
+  "https://litterbox.catbox.moe/resources/internals/api.php",
   {
     method: "POST",
-    headers: {
-      "User-Agent": "KamyVoicemail/1.0"
-    },
     body: formData
   }
 );
 
 if (!uploadRes.ok) {
-  throw new Error(`Catbox upload failed: ${uploadRes.status}`);
+  throw new Error(`Litterbox upload failed: ${uploadRes.status}`);
 }
 
-const catboxUrl = (await uploadRes.text()).trim();
+const litterboxUrl = (await uploadRes.text()).trim();
 
-console.log("Catbox upload status:", uploadRes.status);
-console.log("Catbox URL:", catboxUrl);
+console.log("Litterbox upload status:", uploadRes.status);
+console.log("Litterbox URL:", litterboxUrl);
     
     // Upload to Disroot
     const filename = `voicemail_${Date.now()}.mp3`;
@@ -129,7 +127,7 @@ console.log("Catbox URL:", catboxUrl);
         callerNumber,
         formattedDate,
         formattedTime,
-        catboxUrl,
+        litterboxUrl,
         disrootShareUrl
       })
     });
@@ -139,7 +137,7 @@ console.log("Catbox URL:", catboxUrl);
     console.log("Caller:", callerNumber);
     console.log("Date:", formattedDate);
     console.log("Time:", formattedTime, "ET");
-    console.log("Catbox URL:", catboxUrl);
+    console.log("Litterbox URL:", litterboxUrl);
     console.log("Disroot URL:", disrootShareUrl);
     console.log("=========================================");
 
