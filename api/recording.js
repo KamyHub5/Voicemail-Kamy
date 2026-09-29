@@ -33,20 +33,22 @@ export default async function handler(req, res) {
 
 // Upload to Catbox
     const formData = new FormData();
+    
       formData.append("reqtype", "fileupload");
-
+      formData.append("userhash", config.CATBOX_USERHASH);
+    
     const audioFile = new File(
       [audioBuffer],
       "voicemail.mp3",
       { type: "audio/mpeg" }
-    );
-
-      formData.append("fileToUpload", audioFile);
+      );
+    
+    formData.append("fileToUpload", audioFile);
     
     const uploadRes = await fetch("https://catbox.moe/user/api.php", {
       method: "POST",
       body: formData
-    });
+      });
 
     const catboxUrl = await uploadRes.text();
     console.log("Catbox URL:", catboxUrl);
