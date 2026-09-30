@@ -3,11 +3,24 @@
 // Purpose: Plays initial greeting message and listens for keypad press (*)
 
 import config from "../config.js";
+import { isBlocked } from "./blocks.js";
 
 export default function handler(req, res) {
   const body = req.body || req.query;
   const callerNumber = body.from;
 
+  // Check if caller number is blocked
+  if (isBlocked(callerNumber)) {
+    console.log("BLOCKED CALLER:", callerNumber);
+
+    return res.status(200).json([
+      {
+        action: "hangup"
+      }
+    ]);
+  }
+
+// Proceed to answer voice flow
   res.status(200).json([
     {
       action: "talk",
