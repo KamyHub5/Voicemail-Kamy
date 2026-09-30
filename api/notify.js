@@ -1,3 +1,7 @@
+// VOICEMAIL EMAIL NOTIFICATION
+// Triggered by: Recording processor after voicemail is uploaded
+// Purpose: Sends the caller, date/time, and recording links by email.
+
 import config from "../config.js";
 import nodemailer from "nodemailer";
 
