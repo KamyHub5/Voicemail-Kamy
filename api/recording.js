@@ -1,7 +1,7 @@
 // VOICEMAIL PROCESSOR
 // Triggered by: Completion of a call recording
 // Purpose: Downloads audio from Vonage and uploads to Catbox/Litterbox and Disroot,
-// then sends an email notification.
+// then pushes an email notification
 
 import config from "../config.js";
 import { tokenGenerate } from "@vonage/jwt";
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   console.log("Caller:", callerNumber);
 
   try {
-    // Download from Vonage with JWT
+// Download from Vonage with JWT
     const token = tokenGenerate(
       config.VONAGE_APP_ID,
       config.VONAGE_PRIVATE_KEY
@@ -33,37 +33,37 @@ export default async function handler(req, res) {
     console.log("Downloaded bytes:", audioBuffer.byteLength);
     
 // Upload to Catbox
-const formData = new FormData();
-
-formData.append("reqtype", "fileupload");
-formData.append("time", "72h");
-
-const audioFile = new File(
-  [audioBuffer],
-  "voicemail.mp3",
-  { type: "audio/mpeg" }
-);
-
-formData.append("fileToUpload", audioFile);
-
-const uploadRes = await fetch(
-  "https://litterbox.catbox.moe/resources/internals/api.php",
-  {
-    method: "POST",
-    body: formData
-  }
-);
-
-if (!uploadRes.ok) {
-  throw new Error(`Litterbox upload failed: ${uploadRes.status}`);
-}
-
-const litterboxUrl = (await uploadRes.text()).trim();
-
-console.log("Litterbox upload status:", uploadRes.status);
-console.log("Litterbox URL:", litterboxUrl);
+    const formData = new FormData();
     
-    // Upload to Disroot
+    formData.append("reqtype", "fileupload");
+    formData.append("time", "72h");
+    
+    const audioFile = new File(
+      [audioBuffer],
+      "voicemail.mp3",
+      { type: "audio/mpeg" }
+    );
+    
+    formData.append("fileToUpload", audioFile);
+    
+    const uploadRes = await fetch(
+      "https://litterbox.catbox.moe/resources/internals/api.php",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+    
+    if (!uploadRes.ok) {
+      throw new Error(`Litterbox upload failed: ${uploadRes.status}`);
+    }
+    
+    const litterboxUrl = (await uploadRes.text()).trim();
+    
+    console.log("Litterbox upload status:", uploadRes.status);
+    console.log("Litterbox URL:", litterboxUrl);
+    
+// Upload to Disroot
     const filename = `voicemail_${Date.now()}.mp3`;
 
     const disrootUrl =
@@ -72,7 +72,7 @@ console.log("Litterbox URL:", litterboxUrl);
 
     const credentials = Buffer.from(
       `${config.DISROOT_USER}:${config.DISROOT_PASS}`
-    ).toString("base64");
+      ).toString("base64");
 
     const disrootUpload = await fetch(disrootUrl, {
       method: "PUT",
@@ -85,7 +85,7 @@ console.log("Litterbox URL:", litterboxUrl);
 
     console.log("Disroot upload status:", disrootUpload.status);
 
-    // Create public share link on Disroot
+// Create public share link on Disroot
     const shareRes = await fetch(
       "https://cloud.disroot.org/ocs/v2.php/apps/files_sharing/api/v1/shares",
       {
@@ -103,7 +103,7 @@ console.log("Litterbox URL:", litterboxUrl);
     const shareMatch = shareText.match(/<url>(.*?)<\/url>/);
     const disrootShareUrl = shareMatch ? shareMatch[1] : null;
 
-    // Format date and time
+// Format date and time
     const date = new Date(startTime);
 
     const formattedDate = date.toLocaleDateString("en-US", {
@@ -117,7 +117,7 @@ console.log("Litterbox URL:", litterboxUrl);
       timeZone: "America/New_York"
     });
 
-    // Send email notification
+// Push email notification
     await fetch(`${config.BASE_URL}/api/notify`, {
       method: "POST",
       headers: {
@@ -132,7 +132,7 @@ console.log("Litterbox URL:", litterboxUrl);
       })
     });
 
-    // Log completion
+// Log completion
     console.log("========== VOICEMAIL COMPLETE ==========");
     console.log("Caller:", callerNumber);
     console.log("Date:", formattedDate);
