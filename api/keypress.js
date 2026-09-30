@@ -41,7 +41,7 @@ export default function handler(req, res) {
       action: "connect",
       from: config.VONAGE_NUMBER,
       timeout: 15,
-      eventUrl: [`${config.BASE_URL}/api/outbound-events?from=${callerNumber}`],
+      eventUrl: [`${config.BASE_URL}/api/failover?from=${callerNumber}`],
       eventMethod: "POST",
       eventType: "synchronous",
       endpoint: [{ type: "phone", number: config.KAMY_NUMBER }]
