@@ -4,7 +4,9 @@
 const BLOCKED_NUMBERS = [
   "14243449637",
   "18185782266",
-  "19493892897"
+  "19493892897",
+  "16267720902",
+  "13234169722"
 ];
 
 export function isBlocked(number) {
